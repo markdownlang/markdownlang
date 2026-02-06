@@ -7,13 +7,13 @@ import { parse } from '../src/parser/index.ts';
 import { interpret } from '../src/interpreter/index.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const examplesDir = resolve(__dirname, '../examples');
+const examplesDir = resolve(__dirname, '../../examples/src');
 
 describe('external file imports', () => {
   test('can call function from external file', () => {
-    const md = readFileSync(resolve(examplesDir, 'import-test.md'), 'utf-8');
+    const md = readFileSync(resolve(examplesDir, 'file-import/import-test.md'), 'utf-8');
     const program = parse(md);
-    const output = interpret(program, 'main', [], examplesDir);
+    const output = interpret(program, 'main', [], resolve(examplesDir, 'file-import'));
 
     // double(5) should output 10
     assert.strictEqual(output[0], 10);
@@ -48,7 +48,7 @@ describe('external file imports', () => {
     const program = parse(md);
 
     assert.throws(
-      () => interpret(program, 'main', [], examplesDir),
+      () => interpret(program, 'main', [], resolve(examplesDir, 'file-import')),
       /Function 'nonexistent' not found in 'lib.md'/
     );
   });

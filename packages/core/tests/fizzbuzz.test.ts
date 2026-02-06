@@ -8,7 +8,7 @@ import { interpret } from '../src/interpreter/index.ts';
 import type { RuntimeValue } from '../src/types.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const examplesDir = resolve(__dirname, '../examples');
+const examplesDir = resolve(__dirname, '../../examples/src');
 
 function runFizzbuzz(): RuntimeValue[] {
   const md = readFileSync(resolve(examplesDir, 'fizzbuzz.md'), 'utf-8');

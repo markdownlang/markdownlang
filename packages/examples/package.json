@@ -1,0 +1,16 @@
+{
+  "name": "@markdownlang/examples",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./hello-world.md": "./src/hello-world.md",
+    "./kitchen-sink.md": "./src/kitchen-sink.md",
+    "./fizzbuzz.md": "./src/fizzbuzz.md",
+    "./palindrome.md": "./src/palindrome.md",
+    "./file-import/import-test.md": "./src/file-import/import-test.md",
+    "./file-import/lib.md": "./src/file-import/lib.md",
+    "./errors/type-error.md": "./src/errors/type-error.md",
+    "./errors/undeclared-error.md": "./src/errors/undeclared-error.md"
+  }
+}

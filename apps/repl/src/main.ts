@@ -1,16 +1,16 @@
-import { parse } from '../../src/parser/index.ts';
-import { interpretAsync } from '../../src/interpreter/index.ts';
-import type { RuntimeValue } from '../../src/types.ts';
+import { parse } from '@markdownlang/core/parser';
+import { interpretAsync } from '@markdownlang/core/interpreter';
+import type { RuntimeValue } from '@markdownlang/core/types';
 import { registerFile } from './node-stubs.ts';
 
-import fizzbuzz from '../../examples/fizzbuzz.md?raw';
-import helloWorld from '../../examples/hello-world.md?raw';
-import palindrome from '../../examples/palindrome.md?raw';
-import kitchenSink from '../../examples/kitchen-sink.md?raw';
-import fileImport from '../../examples/file-import/import-test.md?raw';
-import fileImportLib from '../../examples/file-import/lib.md?raw';
-import typeError from '../../examples/errors/type-error.md?raw';
-import undeclaredError from '../../examples/errors/undeclared-error.md?raw';
+import fizzbuzz from '@markdownlang/examples/fizzbuzz.md?raw';
+import helloWorld from '@markdownlang/examples/hello-world.md?raw';
+import palindrome from '@markdownlang/examples/palindrome.md?raw';
+import kitchenSink from '@markdownlang/examples/kitchen-sink.md?raw';
+import fileImport from '@markdownlang/examples/file-import/import-test.md?raw';
+import fileImportLib from '@markdownlang/examples/file-import/lib.md?raw';
+import typeError from '@markdownlang/examples/errors/type-error.md?raw';
+import undeclaredError from '@markdownlang/examples/errors/undeclared-error.md?raw';
 
 // Register virtual files for the file-import example
 registerFile('/lib.md', fileImportLib);

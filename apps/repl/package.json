@@ -1,0 +1,21 @@
+{
+  "name": "@markdownlang/repl",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@markdownlang/core": "workspace:*",
+    "@markdownlang/examples": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.1",
+    "vite": "^6.3.5",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@markdownlang/cli",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-transform-types src/index.ts",
+    "build": "esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/mdl --banner:js='#!/usr/bin/env node'",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@markdownlang/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.1",
+    "esbuild": "^0.27.3",
+    "typescript": "^5.9.3"
+  }
+}

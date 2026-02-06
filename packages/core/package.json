@@ -1,0 +1,27 @@
+{
+  "name": "@markdownlang/core",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./parser": "./src/parser/index.ts",
+    "./interpreter": "./src/interpreter/index.ts",
+    "./types": "./src/types.ts",
+    "./interpreter/type-guards": "./src/interpreter/type-guards.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-transform-types --test tests/*.test.ts",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "jsep": "^1.3.8",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.4"
+  },
+  "devDependencies": {
+    "@markdownlang/examples": "workspace:*",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^25.2.1",
+    "typescript": "^5.9.3"
+  }
+}

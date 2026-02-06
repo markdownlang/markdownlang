@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { createInterface } from 'readline';
-import { parse } from './parser/index.ts';
-import { interpretAsync } from './interpreter/index.ts';
+import { parse } from '@markdownlang/core/parser';
+import { interpretAsync } from '@markdownlang/core/interpreter';
 
 function main(): void {
   const args = process.argv.slice(2);
