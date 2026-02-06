@@ -1,12 +1,37 @@
 // Stubs for Node.js 'fs' and 'path' modules in the browser.
-// File imports are not supported in the web REPL.
+// Supports a virtual filesystem so file-import examples can work.
 
-export function readFileSync(): never {
-  throw new Error('File imports are not supported in the web REPL.');
+const virtualFS = new Map<string, string>();
+
+export function registerFile(path: string, content: string): void {
+  virtualFS.set(normalizePath(path), content);
+}
+
+function normalizePath(p: string): string {
+  // Collapse ../ and ./ segments
+  const parts = p.split('/').filter(Boolean);
+  const resolved: string[] = [];
+  for (const part of parts) {
+    if (part === '..') {
+      resolved.pop();
+    } else if (part !== '.') {
+      resolved.push(part);
+    }
+  }
+  return '/' + resolved.join('/');
+}
+
+export function readFileSync(path: string): string {
+  const normalized = normalizePath(path);
+  const content = virtualFS.get(normalized);
+  if (content !== undefined) {
+    return content;
+  }
+  throw new Error(`File imports are not supported in the web REPL. File not found: ${path}`);
 }
 
 export function resolve(...segments: string[]): string {
-  return segments.join('/');
+  return normalizePath(segments.join('/'));
 }
 
 export function dirname(p: string): string {

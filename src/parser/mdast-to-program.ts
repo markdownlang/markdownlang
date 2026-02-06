@@ -191,7 +191,7 @@ function parseParagraph(node: MdastNode): Statement | null {
   if (children.length === 1 && children[0].type === 'strong') {
     const strongText = extractText(children[0]);
     // Check if expression is wrapped in {expr}
-    const match = strongText.match(/^\{(.+)\}$/);
+    const match = strongText.match(/^\{([^}]+)\}$/);
     if (match) {
       return {
         type: 'PrintStatement',

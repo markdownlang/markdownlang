@@ -25,6 +25,12 @@ export class UndeclaredVariableError extends Error {
  * Validate that a value is a number
  */
 export function expectNumber(value: RuntimeValue, context: string, line?: number): number {
+  if (typeof value === 'string') {
+    const num = Number(value);
+    if (!isNaN(num)) {
+      return num;
+    }
+  }
   if (typeof value !== 'number') {
     throw new RuntimeTypeError(
       `Expected number for ${context}, got ${typeof value} (${value})`,
@@ -38,6 +44,9 @@ export function expectNumber(value: RuntimeValue, context: string, line?: number
  * Validate that a value is a string
  */
 export function expectString(value: RuntimeValue, context: string, line?: number): string {
+  if (typeof value === 'number') {
+    return String(value);
+  }
   if (typeof value !== 'string') {
     throw new RuntimeTypeError(
       `Expected string for ${context}, got ${typeof value} (${value})`,
@@ -51,13 +60,16 @@ export function expectString(value: RuntimeValue, context: string, line?: number
  * Validate that a value is a string or number (for member access index)
  */
 export function expectStringOrNumber(value: RuntimeValue, context: string, line?: number): string | number {
-  if (typeof value !== 'string' && typeof value !== 'number') {
-    throw new RuntimeTypeError(
-      `Expected string or number for ${context}, got ${typeof value} (${value})`,
-      line
-    );
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value;
   }
-  return value;
+  if (typeof value === 'boolean') {
+    return Number(value);
+  }
+  throw new RuntimeTypeError(
+    `Expected string or number for ${context}, got ${typeof value} (${value})`,
+    line
+  );
 }
 
 /**

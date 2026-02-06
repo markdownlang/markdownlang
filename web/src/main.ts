@@ -1,17 +1,26 @@
 import { parse } from '../../src/parser/index.ts';
 import { interpretAsync } from '../../src/interpreter/index.ts';
 import type { RuntimeValue } from '../../src/types.ts';
+import { registerFile } from './node-stubs.ts';
 
 import fizzbuzz from '../../examples/fizzbuzz.md?raw';
 import helloWorld from '../../examples/hello-world.md?raw';
 import palindrome from '../../examples/palindrome.md?raw';
+import kitchenSink from '../../examples/kitchen-sink.md?raw';
+import fileImport from '../../examples/file-import/import-test.md?raw';
+import fileImportLib from '../../examples/file-import/lib.md?raw';
 import typeError from '../../examples/errors/type-error.md?raw';
 import undeclaredError from '../../examples/errors/undeclared-error.md?raw';
 
+// Register virtual files for the file-import example
+registerFile('/lib.md', fileImportLib);
+
 const EXAMPLES: Record<string, string> = {
-  'fizzbuzz': fizzbuzz,
   'hello-world': helloWorld,
+  'kitchen-sink': kitchenSink,
+  'fizzbuzz': fizzbuzz,
   'palindrome': palindrome,
+  'file-import': fileImport,
   'type-error': typeError,
   'undeclared-error': undeclaredError,
 };

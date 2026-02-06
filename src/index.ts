@@ -26,11 +26,38 @@ function main(): void {
   });
 
   // Input reader function that prompts user
+  const lineBuffer: string[] = [];
+  let lineResolve: ((value: string) => void) | null = null;
+  let rlClosed = false;
+
+  rl.on('line', (line) => {
+    if (lineResolve) {
+      const resolve = lineResolve;
+      lineResolve = null;
+      resolve(line);
+    } else {
+      lineBuffer.push(line);
+    }
+  });
+
+  rl.on('close', () => {
+    rlClosed = true;
+    if (lineResolve) {
+      const resolve = lineResolve;
+      lineResolve = null;
+      resolve('');
+    }
+  });
+
   const inputReader = (): Promise<string> => {
+    if (lineBuffer.length > 0) {
+      return Promise.resolve(lineBuffer.shift()!);
+    }
+    if (rlClosed) {
+      return Promise.resolve('');
+    }
     return new Promise((resolve) => {
-      rl.question('', (answer) => {
-        resolve(answer);
-      });
+      lineResolve = resolve;
     });
   };
 

@@ -274,6 +274,8 @@ function executeFunctionCall(
   while (result && result.type === TAIL_CALL) {
     result = executeFunction(result.program, result.func, result.args, result.runtime as Runtime);
   }
+  // Clear break flag so it doesn't propagate to the caller
+  runtime.clearBreak();
   return null;
 }
 
@@ -445,6 +447,8 @@ async function executeFunctionCallAsync(
   while (result && result.type === TAIL_CALL) {
     result = await executeFunctionAsync(result.program, result.func, result.args, result.runtime as Runtime);
   }
+  // Clear break flag so it doesn't propagate to the caller
+  runtime.clearBreak();
   return null;
 }
 
