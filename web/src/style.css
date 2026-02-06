@@ -1,0 +1,139 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #1e1e2e;
+  --surface: #282840;
+  --border: #3e3e5e;
+  --text: #e0e0e0;
+  --muted: #a0a0b8;
+  --accent: #7c8ff4;
+  --accent-hover: #9aa4f8;
+  --error: #f87171;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+#run {
+  padding: 0.4rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#run:hover {
+  background: var(--accent-hover);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.github-link {
+  color: var(--muted);
+  display: flex;
+  transition: color 0.15s;
+}
+
+.github-link:hover {
+  color: var(--text);
+}
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: calc(100vh - 49px);
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pane:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.pane label {
+  padding: 0.4rem 1rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+#editor {
+  flex: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  background: var(--surface);
+  color: var(--text);
+  tab-size: 2;
+}
+
+#output {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#output.error {
+  color: var(--error);
+}
+
+@media (max-width: 700px) {
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .pane:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}

@@ -11,7 +11,10 @@
         "start": "node --experimental-transform-types src/index.ts",
         "test": "node --experimental-transform-types --test tests/*.test.ts",
         "build": "esbuild src/index.ts --bundle --platform=node --format=esm --outfile=mdl --banner:js='#!/usr/bin/env node'",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+    "web": "cd web && pnpm dev",
+    "web:build": "cd web && pnpm build",
+    "web:preview": "cd web && pnpm preview"
     },
     "dependencies": {
         "jsep": "^1.3.8",
