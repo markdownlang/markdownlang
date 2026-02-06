@@ -53,10 +53,36 @@ text += "buzz"
 `;
 
 const editor = document.getElementById('editor') as HTMLTextAreaElement;
-const output = document.getElementById('output') as HTMLPreElement;
+const output = document.getElementById('output') as HTMLDivElement;
 const runBtn = document.getElementById('run') as HTMLButtonElement;
 
 editor.value = DEFAULT_PROGRAM;
+
+function appendText(text: string) {
+  output.appendChild(document.createTextNode(text));
+  output.scrollTop = output.scrollHeight;
+}
+
+function inlineInput(): Promise<string> {
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'inline-input';
+    output.appendChild(input);
+    input.focus();
+    output.scrollTop = output.scrollHeight;
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const value = input.value;
+        input.disabled = true;
+        input.classList.add('submitted');
+        appendText('\n');
+        resolve(value);
+      }
+    });
+  });
+}
 
 async function run() {
   output.textContent = '';
@@ -67,19 +93,14 @@ async function run() {
   try {
     const program = parse(source);
 
-    const inputReader = async (): Promise<string> => {
-      const result = window.prompt('Program requests input:');
-      return result ?? '';
-    };
-
     const printHandler = (value: RuntimeValue): void => {
-      output.textContent += String(value) + '\n';
+      appendText(String(value) + '\n');
     };
 
-    await interpretAsync(program, 'main', [], '', inputReader, printHandler);
+    await interpretAsync(program, 'main', [], '', inlineInput, printHandler);
   } catch (err: unknown) {
     output.classList.add('error');
-    output.textContent = err instanceof Error ? err.message : String(err);
+    appendText(err instanceof Error ? err.message : String(err));
   }
 }
 

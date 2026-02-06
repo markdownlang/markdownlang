@@ -126,6 +126,25 @@ main {
   color: var(--error);
 }
 
+.inline-input {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  background: transparent;
+  color: var(--accent);
+  border: none;
+  border-bottom: 1px solid var(--accent);
+  outline: none;
+  caret-color: var(--accent);
+  width: 50%;
+  min-width: 8ch;
+}
+
+.inline-input.submitted {
+  color: var(--muted);
+  border-bottom-color: transparent;
+}
+
 @media (max-width: 700px) {
   main {
     grid-template-columns: 1fr;
