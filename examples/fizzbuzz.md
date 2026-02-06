@@ -7,13 +7,14 @@
 - start
 - end
 
-[start](#loop)
+[start, end](#loop)
 
 # loop
 
 - i
+- end
 
-## _i > 100_
+## _i > end_
 
 ---
 
@@ -21,7 +22,7 @@
 
 **fizzbuzz**
 
-[i + 1](#loop)
+[i + 1, end](#loop)
 
 ---
 
@@ -37,18 +38,10 @@ text += "buzz"
 
 **{text}**
 
-[i + 1](#loop)
-
----
-
-## _i % 5 == 0_
-
-**{"buzz"}**
-
-[i + 1](#loop)
+[i + 1, end](#loop)
 
 ---
 
 **{i}**
 
-[i + 1](#loop)
+[i + 1, end](#loop)
