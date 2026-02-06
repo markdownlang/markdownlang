@@ -134,6 +134,36 @@ main {
   color: var(--text);
 }
 
+#tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+#tab-bar:empty { display: none; }
+
+#tab-bar .tab {
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+#tab-bar .tab:hover { color: var(--text); }
+
+#tab-bar .tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
 #editor {
   flex: 1;
   resize: none;

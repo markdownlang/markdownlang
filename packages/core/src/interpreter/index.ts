@@ -24,6 +24,10 @@ import {
 // Cache for external programs to avoid re-parsing
 const externalProgramCache = new Map<string, Program>();
 
+export function clearExternalProgramCache(): void {
+  externalProgramCache.clear();
+}
+
 /**
  * Load and parse an external markdown file
  */

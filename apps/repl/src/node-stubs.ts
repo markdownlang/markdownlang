@@ -7,6 +7,10 @@ export function registerFile(path: string, content: string): void {
   virtualFS.set(normalizePath(path), content);
 }
 
+export function clearFiles(): void {
+  virtualFS.clear();
+}
+
 function normalizePath(p: string): string {
   // Collapse ../ and ./ segments
   const parts = p.split('/').filter(Boolean);
