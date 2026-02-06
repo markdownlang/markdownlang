@@ -5,22 +5,23 @@
 }
 
 :root {
-  --bg: #1e1e2e;
-  --surface: #282840;
-  --border: #3e3e5e;
-  --text: #e0e0e0;
-  --muted: #a0a0b8;
-  --accent: #7c8ff4;
-  --accent-hover: #9aa4f8;
-  --error: #f87171;
+  --bg: #f5f0eb;
+  --surface: #faf7f3;
+  --border: #d4cdc4;
+  --text: #2c2420;
+  --muted: #8a7f74;
+  --accent: #6b5c4d;
+  --accent-hover: #8a7464;
+  --error: #c44d3f;
   --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  --font-serif: Georgia, 'Times New Roman', 'Palatino Linotype', serif;
 }
 
 html, body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
 }
 
 header {
@@ -42,8 +43,8 @@ header h1 {
   border: none;
   border-radius: 6px;
   background: var(--accent);
-  color: #fff;
-  font-family: var(--font-mono);
+  color: #faf7f3;
+  font-family: var(--font-serif);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -108,7 +109,7 @@ main {
 }
 
 #examples {
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-size: 0.7rem;
   background: var(--surface);
   color: var(--muted);
@@ -149,7 +150,7 @@ main {
   align-items: center;
   gap: 0.35rem;
   padding: 0.4rem 0.75rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-size: 0.7rem;
   color: var(--muted);
   background: transparent;
@@ -196,7 +197,7 @@ main {
 }
 
 .tab-add {
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-size: 0.8rem;
   color: var(--muted);
   background: transparent;
@@ -211,7 +212,7 @@ main {
 .tab-spacer { flex: 1; }
 
 .tab-download {
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-size: 0.65rem;
   color: var(--muted);
   background: transparent;
@@ -242,7 +243,7 @@ main {
   flex: 1;
   overflow: auto;
   padding: 1rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-size: 0.9rem;
   line-height: 1.6;
   background: var(--bg);
