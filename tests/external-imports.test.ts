@@ -3,8 +3,8 @@ import assert from 'node:assert';
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { parse } from '../src/parser/index.js';
-import { interpret } from '../src/interpreter/index.js';
+import { parse } from '../src/parser/index.ts';
+import { interpret } from '../src/interpreter/index.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const examplesDir = resolve(__dirname, '../examples');
@@ -25,8 +25,10 @@ describe('external file imports', () => {
     const statement = program.functions['main'].body[0];
 
     assert.strictEqual(statement.type, 'FunctionCallStatement');
-    assert.strictEqual(statement.externalFile, 'lib.md');
-    assert.strictEqual(statement.functionName, 'double');
+    if (statement.type === 'FunctionCallStatement') {
+      assert.strictEqual(statement.externalFile, 'lib.md');
+      assert.strictEqual(statement.functionName, 'double');
+    }
   });
 
   test('parser handles internal calls correctly', () => {
@@ -35,8 +37,10 @@ describe('external file imports', () => {
     const statement = program.functions['main'].body[0];
 
     assert.strictEqual(statement.type, 'FunctionCallStatement');
-    assert.strictEqual(statement.externalFile, null);
-    assert.strictEqual(statement.functionName, 'helper');
+    if (statement.type === 'FunctionCallStatement') {
+      assert.strictEqual(statement.externalFile, null);
+      assert.strictEqual(statement.functionName, 'helper');
+    }
   });
 
   test('throws error for missing external function', () => {

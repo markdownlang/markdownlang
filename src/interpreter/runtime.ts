@@ -1,27 +1,34 @@
+import type {
+  CallFrame,
+  RuntimeValue,
+  InputReader,
+  PrintHandler,
+  RuntimeInterface,
+} from '../types.ts';
+
 /**
  * Runtime manages the call stack, variable scopes, and output
  */
-export class Runtime {
-  constructor() {
-    this.callStack = [];
-    this.output = [];
-    this.breakFlag = false;
-    this.inputBuffer = [];
-    this.inputIndex = 0;
-    this.printHandler = null; // For immediate output
-  }
+export class Runtime implements RuntimeInterface {
+  callStack: CallFrame[] = [];
+  output: RuntimeValue[] = [];
+  breakFlag: boolean = false;
+  inputBuffer: RuntimeValue[] = [];
+  inputIndex: number = 0;
+  inputReader: InputReader | null = null;
+  printHandler: PrintHandler | null = null;
 
   /**
    * Set a handler for immediate print output
    */
-  setPrintHandler(handler) {
+  setPrintHandler(handler: PrintHandler): void {
     this.printHandler = handler;
   }
 
   /**
    * Set input buffer for reading (sync mode)
    */
-  setInput(inputs) {
+  setInput(inputs: RuntimeValue[]): void {
     this.inputBuffer = Array.isArray(inputs) ? inputs : [];
     this.inputIndex = 0;
   }
@@ -29,14 +36,14 @@ export class Runtime {
   /**
    * Set async input reader function
    */
-  setInputReader(reader) {
+  setInputReader(reader: InputReader): void {
     this.inputReader = reader;
   }
 
   /**
    * Read next input from buffer (sync mode)
    */
-  readInput() {
+  readInput(): RuntimeValue {
     if (this.inputIndex < this.inputBuffer.length) {
       return this.inputBuffer[this.inputIndex++];
     }
@@ -46,7 +53,7 @@ export class Runtime {
   /**
    * Read input asynchronously
    */
-  async readInputAsync() {
+  async readInputAsync(): Promise<RuntimeValue> {
     if (this.inputReader) {
       return await this.inputReader();
     }
@@ -56,7 +63,7 @@ export class Runtime {
   /**
    * Push a new call frame onto the stack
    */
-  pushFrame(functionName, args = {}) {
+  pushFrame(functionName: string, args: Record<string, RuntimeValue> = {}): void {
     this.callStack.push({
       functionName,
       variables: { ...args }
@@ -66,21 +73,21 @@ export class Runtime {
   /**
    * Pop the current call frame
    */
-  popFrame() {
+  popFrame(): CallFrame | undefined {
     return this.callStack.pop();
   }
 
   /**
    * Get the current call frame
    */
-  currentFrame() {
+  currentFrame(): CallFrame | undefined {
     return this.callStack[this.callStack.length - 1];
   }
 
   /**
    * Get a variable value from current scope
    */
-  getVariable(name) {
+  getVariable(name: string): RuntimeValue {
     const frame = this.currentFrame();
     if (frame && name in frame.variables) {
       return frame.variables[name];
@@ -91,7 +98,7 @@ export class Runtime {
   /**
    * Set a variable in current scope
    */
-  setVariable(name, value) {
+  setVariable(name: string, value: RuntimeValue): void {
     const frame = this.currentFrame();
     if (frame) {
       frame.variables[name] = value;
@@ -101,7 +108,7 @@ export class Runtime {
   /**
    * Add output
    */
-  print(value) {
+  print(value: RuntimeValue): void {
     this.output.push(value);
     // If there's a print handler, call it immediately
     if (this.printHandler) {
@@ -112,21 +119,21 @@ export class Runtime {
   /**
    * Get all output
    */
-  getOutput() {
+  getOutput(): RuntimeValue[] {
     return this.output;
   }
 
   /**
    * Set the break flag
    */
-  setBreak() {
+  setBreak(): void {
     this.breakFlag = true;
   }
 
   /**
    * Check and clear break flag
    */
-  shouldBreak() {
+  shouldBreak(): boolean {
     if (this.breakFlag) {
       this.breakFlag = false;
       return true;
@@ -137,7 +144,7 @@ export class Runtime {
   /**
    * Clear break flag (when exiting a conditional block)
    */
-  clearBreak() {
+  clearBreak(): void {
     this.breakFlag = false;
   }
 }

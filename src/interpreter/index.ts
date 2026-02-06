@@ -1,20 +1,36 @@
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
-import { Runtime } from './runtime.js';
-import { evaluate } from './evaluator.js';
-import { parse } from '../parser/index.js';
+import { Runtime } from './runtime.ts';
+import { evaluate } from './evaluator.ts';
+import { expectNumber } from './type-guards.ts';
+import { parse } from '../parser/index.ts';
+import {
+  TAIL_CALL,
+  type Program,
+  type FunctionDeclaration,
+  type Statement,
+  type PrintStatement,
+  type AssignmentStatement,
+  type FunctionCallStatement,
+  type ConditionalBlock,
+  type InputStatement,
+  type RuntimeValue,
+  type InputReader,
+  type PrintHandler,
+  type TailCallResult,
+} from '../types.ts';
 
 // Cache for external programs to avoid re-parsing
-const externalProgramCache = new Map();
+const externalProgramCache = new Map<string, Program>();
 
 /**
  * Load and parse an external markdown file
  */
-function loadExternalProgram(filePath, baseDir) {
+function loadExternalProgram(filePath: string, baseDir: string): { program: Program; fullPath: string } {
   const fullPath = resolve(baseDir, filePath);
 
   if (externalProgramCache.has(fullPath)) {
-    return { program: externalProgramCache.get(fullPath), fullPath };
+    return { program: externalProgramCache.get(fullPath)!, fullPath };
   }
 
   const markdown = readFileSync(fullPath, 'utf-8');
@@ -25,13 +41,16 @@ function loadExternalProgram(filePath, baseDir) {
   return { program, fullPath };
 }
 
-// Symbol to indicate a tail call
-const TAIL_CALL = Symbol('TailCall');
-
 /**
  * Interpret a Program AST
  */
-export function interpret(program, entryPoint = 'main', args = [], baseDir = process.cwd(), inputs = []) {
+export function interpret(
+  program: Program,
+  entryPoint: string = 'main',
+  args: RuntimeValue[] = [],
+  baseDir: string = process.cwd(),
+  inputs: RuntimeValue[] = []
+): RuntimeValue[] {
   const runtime = new Runtime();
   runtime.setInput(inputs);
   program._baseDir = baseDir;
@@ -43,7 +62,7 @@ export function interpret(program, entryPoint = 'main', args = [], baseDir = pro
   }
 
   // Execute with trampoline for tail call optimization
-  let result = { type: TAIL_CALL, program, func: mainFunc, args, runtime };
+  let result: TailCallResult | null = { type: TAIL_CALL, program, func: mainFunc, args, runtime };
   while (result && result.type === TAIL_CALL) {
     result = executeFunction(result.program, result.func, result.args, result.runtime);
   }
@@ -51,9 +70,14 @@ export function interpret(program, entryPoint = 'main', args = [], baseDir = pro
   return runtime.getOutput();
 }
 
-function executeFunction(program, func, args, runtime) {
+function executeFunction(
+  program: Program,
+  func: FunctionDeclaration,
+  args: RuntimeValue[],
+  runtime: Runtime
+): TailCallResult | null {
   // Create argument bindings
-  const argBindings = {};
+  const argBindings: Record<string, RuntimeValue> = {};
   for (let i = 0; i < func.parameters.length; i++) {
     argBindings[func.parameters[i]] = args[i];
   }
@@ -71,7 +95,11 @@ function executeFunction(program, func, args, runtime) {
   return result;
 }
 
-function executeBlock(program, statements, runtime) {
+function executeBlock(
+  program: Program,
+  statements: Statement[],
+  runtime: Runtime
+): TailCallResult | null {
   for (let i = 0; i < statements.length; i++) {
     if (runtime.breakFlag) {
       break;
@@ -86,7 +114,12 @@ function executeBlock(program, statements, runtime) {
   return null;
 }
 
-function executeStatement(program, statement, runtime, isLast = false) {
+function executeStatement(
+  program: Program,
+  statement: Statement,
+  runtime: Runtime,
+  isLast: boolean = false
+): TailCallResult | null {
   switch (statement.type) {
     case 'PrintStatement':
       executePrint(statement, runtime);
@@ -100,7 +133,7 @@ function executeStatement(program, statement, runtime, isLast = false) {
       return executeFunctionCall(program, statement, runtime, isLast);
 
     case 'ConditionalBlock':
-      return executeConditional(program, statement, runtime, isLast);
+      return executeConditional(program, statement, runtime);
 
     case 'BreakStatement':
       runtime.setBreak();
@@ -111,46 +144,55 @@ function executeStatement(program, statement, runtime, isLast = false) {
       return null;
 
     default:
-      throw new Error(`Unknown statement type: ${statement.type}`);
+      throw new Error(`Unknown statement type: ${(statement as Statement).type}`);
   }
 }
 
-function executeInput(statement, runtime) {
+function executeInput(statement: InputStatement, runtime: Runtime): void {
   const value = runtime.readInput();
   runtime.setVariable(statement.variable, value);
 }
 
 // Async input execution
-async function executeInputAsync(statement, runtime) {
+async function executeInputAsync(statement: InputStatement, runtime: Runtime): Promise<void> {
   const value = await runtime.readInputAsync();
   runtime.setVariable(statement.variable, value);
 }
 
-function executePrint(statement, runtime) {
-  const value = evaluate(statement.expression, runtime);
+function executePrint(statement: PrintStatement, runtime: Runtime): void {
+  const value = evaluate(statement.expression, runtime, statement.line);
   runtime.print(value);
 }
 
-function executeAssignment(statement, runtime) {
-  const newValue = evaluate(statement.value, runtime);
+function executeAssignment(statement: AssignmentStatement, runtime: Runtime): void {
+  const newValue = evaluate(statement.value, runtime, statement.line);
 
   if (statement.operator) {
     // Compound assignment
     const currentValue = runtime.getVariable(statement.variable) ?? getDefaultValue(newValue);
-    let result;
+    let result: RuntimeValue;
 
     switch (statement.operator) {
       case '+':
-        result = currentValue + newValue;
+        // Allow string concatenation: string += string OR string += number
+        if (typeof currentValue === 'string' || typeof newValue === 'string') {
+          result = String(currentValue ?? '') + String(newValue ?? '');
+        } else {
+          result = expectNumber(currentValue, `variable '${statement.variable}'`, statement.line) +
+                   expectNumber(newValue, 'assignment value', statement.line);
+        }
         break;
       case '-':
-        result = currentValue - newValue;
+        result = expectNumber(currentValue, `variable '${statement.variable}'`, statement.line) -
+                 expectNumber(newValue, 'assignment value', statement.line);
         break;
       case '*':
-        result = currentValue * newValue;
+        result = expectNumber(currentValue, `variable '${statement.variable}'`, statement.line) *
+                 expectNumber(newValue, 'assignment value', statement.line);
         break;
       case '/':
-        result = currentValue / newValue;
+        result = expectNumber(currentValue, `variable '${statement.variable}'`, statement.line) /
+                 expectNumber(newValue, 'assignment value', statement.line);
         break;
       default:
         throw new Error(`Unknown compound operator: ${statement.operator}`);
@@ -163,15 +205,20 @@ function executeAssignment(statement, runtime) {
   }
 }
 
-function getDefaultValue(value) {
+function getDefaultValue(value: RuntimeValue): RuntimeValue {
   if (typeof value === 'string') return '';
   if (typeof value === 'number') return 0;
   return undefined;
 }
 
-function executeFunctionCall(program, statement, runtime, isLast = false) {
+function executeFunctionCall(
+  program: Program,
+  statement: FunctionCallStatement,
+  runtime: Runtime,
+  isLast: boolean = false
+): TailCallResult | null {
   let targetProgram = program;
-  let func;
+  let func: FunctionDeclaration;
 
   if (statement.externalFile) {
     // Load external file
@@ -190,7 +237,7 @@ function executeFunctionCall(program, statement, runtime, isLast = false) {
   }
 
   // Evaluate arguments
-  const args = statement.arguments.map(arg => evaluate(arg, runtime));
+  const args = statement.arguments.map(arg => evaluate(arg, runtime, statement.line));
 
   // If this is a tail call (last statement in block), return thunk for trampoline
   if (isLast) {
@@ -198,15 +245,19 @@ function executeFunctionCall(program, statement, runtime, isLast = false) {
   }
 
   // Otherwise execute normally with trampoline
-  let result = { type: TAIL_CALL, program: targetProgram, func, args, runtime };
+  let result: TailCallResult | null = { type: TAIL_CALL, program: targetProgram, func, args, runtime };
   while (result && result.type === TAIL_CALL) {
-    result = executeFunction(result.program, result.func, result.args, result.runtime);
+    result = executeFunction(result.program, result.func, result.args, result.runtime as Runtime);
   }
   return null;
 }
 
-function executeConditional(program, statement, runtime, isLast = false) {
-  const condition = evaluate(statement.condition, runtime);
+function executeConditional(
+  program: Program,
+  statement: ConditionalBlock,
+  runtime: Runtime
+): TailCallResult | null {
+  const condition = evaluate(statement.condition, runtime, statement.line);
 
   if (condition) {
     return executeBlock(program, statement.body, runtime);
@@ -214,13 +265,17 @@ function executeConditional(program, statement, runtime, isLast = false) {
   return null;
 }
 
-// Symbol to indicate async input needed
-const ASYNC_INPUT = Symbol('AsyncInput');
-
 /**
  * Interpret a Program AST asynchronously (supports interactive input)
  */
-export async function interpretAsync(program, entryPoint = 'main', args = [], baseDir = process.cwd(), inputReader = null, printHandler = null) {
+export async function interpretAsync(
+  program: Program,
+  entryPoint: string = 'main',
+  args: RuntimeValue[] = [],
+  baseDir: string = process.cwd(),
+  inputReader: InputReader | null = null,
+  printHandler: PrintHandler | null = null
+): Promise<RuntimeValue[]> {
   const runtime = new Runtime();
   if (inputReader) {
     runtime.setInputReader(inputReader);
@@ -237,22 +292,22 @@ export async function interpretAsync(program, entryPoint = 'main', args = [], ba
   }
 
   // Execute with async trampoline for tail call optimization
-  let result = { type: TAIL_CALL, program, func: mainFunc, args, runtime };
-  while (result && (result.type === TAIL_CALL || result.type === ASYNC_INPUT)) {
-    if (result.type === ASYNC_INPUT) {
-      await executeInputAsync(result.statement, runtime);
-      result = result.continuation();
-    } else {
-      result = await executeFunctionAsync(result.program, result.func, result.args, result.runtime);
-    }
+  let result: TailCallResult | null = { type: TAIL_CALL, program, func: mainFunc, args, runtime };
+  while (result && result.type === TAIL_CALL) {
+    result = await executeFunctionAsync(result.program, result.func, result.args, result.runtime as Runtime);
   }
 
   return runtime.getOutput();
 }
 
-async function executeFunctionAsync(program, func, args, runtime) {
+async function executeFunctionAsync(
+  program: Program,
+  func: FunctionDeclaration,
+  args: RuntimeValue[],
+  runtime: Runtime
+): Promise<TailCallResult | null> {
   // Create argument bindings
-  const argBindings = {};
+  const argBindings: Record<string, RuntimeValue> = {};
   for (let i = 0; i < func.parameters.length; i++) {
     argBindings[func.parameters[i]] = args[i];
   }
@@ -270,7 +325,11 @@ async function executeFunctionAsync(program, func, args, runtime) {
   return result;
 }
 
-async function executeBlockAsync(program, statements, runtime) {
+async function executeBlockAsync(
+  program: Program,
+  statements: Statement[],
+  runtime: Runtime
+): Promise<TailCallResult | null> {
   for (let i = 0; i < statements.length; i++) {
     if (runtime.breakFlag) {
       break;
@@ -285,7 +344,12 @@ async function executeBlockAsync(program, statements, runtime) {
   return null;
 }
 
-async function executeStatementAsync(program, statement, runtime, isLast = false) {
+async function executeStatementAsync(
+  program: Program,
+  statement: Statement,
+  runtime: Runtime,
+  isLast: boolean = false
+): Promise<TailCallResult | null> {
   switch (statement.type) {
     case 'PrintStatement':
       executePrint(statement, runtime);
@@ -299,7 +363,7 @@ async function executeStatementAsync(program, statement, runtime, isLast = false
       return await executeFunctionCallAsync(program, statement, runtime, isLast);
 
     case 'ConditionalBlock':
-      return await executeConditionalAsync(program, statement, runtime, isLast);
+      return await executeConditionalAsync(program, statement, runtime);
 
     case 'BreakStatement':
       runtime.setBreak();
@@ -310,13 +374,18 @@ async function executeStatementAsync(program, statement, runtime, isLast = false
       return null;
 
     default:
-      throw new Error(`Unknown statement type: ${statement.type}`);
+      throw new Error(`Unknown statement type: ${(statement as Statement).type}`);
   }
 }
 
-async function executeFunctionCallAsync(program, statement, runtime, isLast = false) {
+async function executeFunctionCallAsync(
+  program: Program,
+  statement: FunctionCallStatement,
+  runtime: Runtime,
+  isLast: boolean = false
+): Promise<TailCallResult | null> {
   let targetProgram = program;
-  let func;
+  let func: FunctionDeclaration;
 
   if (statement.externalFile) {
     // Load external file
@@ -335,7 +404,7 @@ async function executeFunctionCallAsync(program, statement, runtime, isLast = fa
   }
 
   // Evaluate arguments
-  const args = statement.arguments.map(arg => evaluate(arg, runtime));
+  const args = statement.arguments.map(arg => evaluate(arg, runtime, statement.line));
 
   // If this is a tail call (last statement in block), return thunk for trampoline
   if (isLast) {
@@ -343,15 +412,19 @@ async function executeFunctionCallAsync(program, statement, runtime, isLast = fa
   }
 
   // Otherwise execute normally with async trampoline
-  let result = { type: TAIL_CALL, program: targetProgram, func, args, runtime };
+  let result: TailCallResult | null = { type: TAIL_CALL, program: targetProgram, func, args, runtime };
   while (result && result.type === TAIL_CALL) {
-    result = await executeFunctionAsync(result.program, result.func, result.args, result.runtime);
+    result = await executeFunctionAsync(result.program, result.func, result.args, result.runtime as Runtime);
   }
   return null;
 }
 
-async function executeConditionalAsync(program, statement, runtime, isLast = false) {
-  const condition = evaluate(statement.condition, runtime);
+async function executeConditionalAsync(
+  program: Program,
+  statement: ConditionalBlock,
+  runtime: Runtime
+): Promise<TailCallResult | null> {
+  const condition = evaluate(statement.condition, runtime, statement.line);
 
   if (condition) {
     return await executeBlockAsync(program, statement.body, runtime);

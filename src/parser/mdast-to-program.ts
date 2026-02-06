@@ -1,21 +1,39 @@
-import { parseExpression } from './expression-parser.js';
+import type { Expression } from 'jsep';
+import type { Root, RootContent, PhrasingContent } from 'mdast';
+import { parseExpression } from './expression-parser.ts';
+import type {
+  Program,
+  FunctionDeclaration,
+  Statement,
+  ConditionalBlock,
+  TemplatePart,
+  TemplateLiteralExpression,
+} from '../types.ts';
+
+// Node type that may have children or value
+interface MdastNode {
+  type: string;
+  value?: string;
+  children?: MdastNode[];
+  position?: { start?: { line?: number } };
+}
 
 /**
  * Stage 2: Transform mdast to Program AST
  */
-export function mdastToProgram(mdast) {
-  const program = {
+export function mdastToProgram(mdast: Root): Program {
+  const program: Program = {
     type: 'Program',
     functions: {}
   };
 
-  let currentFunction = null;
-  let currentBlock = null; // The current block we're adding statements to
+  let currentFunction: FunctionDeclaration | null = null;
+  let currentBlock: Statement[] | null = null; // The current block we're adding statements to
 
   for (const node of mdast.children) {
     if (node.type === 'heading' && node.depth === 1) {
       // Function declaration: # name
-      const funcName = extractText(node);
+      const funcName = extractText(node as MdastNode);
       currentFunction = {
         type: 'FunctionDeclaration',
         name: funcName,
@@ -26,12 +44,13 @@ export function mdastToProgram(mdast) {
       program.functions[funcName] = currentFunction;
     } else if (node.type === 'heading' && node.depth === 2 && currentFunction) {
       // Conditional block: ## *condition*
-      const conditionText = extractEmphasisText(node);
+      const conditionText = extractEmphasisText(node as MdastNode);
       if (conditionText) {
-        const conditional = {
+        const conditional: ConditionalBlock = {
           type: 'ConditionalBlock',
           condition: parseExpression(conditionText),
-          body: []
+          body: [],
+          line: (node as MdastNode).position?.start?.line
         };
         currentFunction.body.push(conditional);
         currentBlock = conditional.body;
@@ -39,27 +58,29 @@ export function mdastToProgram(mdast) {
     } else if (node.type === 'list' && !node.ordered && currentFunction) {
       // Parameter declarations: - varname
       for (const item of node.children) {
-        const paramName = extractText(item);
+        const paramName = extractText(item as MdastNode);
         currentFunction.parameters.push(paramName);
       }
     } else if (node.type === 'paragraph' && currentBlock) {
-      const statement = parseParagraph(node);
+      const statement = parseParagraph(node as MdastNode);
       if (statement) {
+        statement.line = (node as MdastNode).position?.start?.line;
         currentBlock.push(statement);
       }
     } else if (node.type === 'thematicBreak' && currentFunction) {
       // Break statement: --- adds break to current block and resets to function body
       if (currentBlock) {
-        currentBlock.push({ type: 'BreakStatement' });
+        currentBlock.push({ type: 'BreakStatement', line: (node as MdastNode).position?.start?.line });
       }
       currentBlock = currentFunction.body;
     } else if (node.type === 'blockquote' && currentBlock) {
       // Input statement: > variableName
-      const varName = extractText(node).trim();
+      const varName = extractText(node as MdastNode).trim();
       if (varName) {
         currentBlock.push({
           type: 'InputStatement',
-          variable: varName
+          variable: varName,
+          line: (node as MdastNode).position?.start?.line
         });
       }
     }
@@ -72,7 +93,7 @@ export function mdastToProgram(mdast) {
 /**
  * Extract plain text from an mdast node
  */
-function extractText(node) {
+function extractText(node: MdastNode): string {
   let text = '';
   if (node.type === 'inlineCode') {
     return ''; // Skip inline code - treat as comment
@@ -91,7 +112,7 @@ function extractText(node) {
 /**
  * Extract text from emphasis (*text*) within a node
  */
-function extractEmphasisText(node) {
+function extractEmphasisText(node: MdastNode): string | null {
   for (const child of node.children || []) {
     if (child.type === 'emphasis') {
       return extractText(child);
@@ -104,8 +125,8 @@ function extractEmphasisText(node) {
  * Parse a template literal string into parts (literals and expressions)
  * e.g. "Hello, {name}!" -> [{ type: 'literal', value: 'Hello, ' }, { type: 'expression', expr: ... }, { type: 'literal', value: '!' }]
  */
-function parseTemplateLiteral(text) {
-  const parts = [];
+function parseTemplateLiteral(text: string): TemplatePart[] {
+  const parts: TemplatePart[] = [];
   let current = '';
   let i = 0;
 
@@ -144,7 +165,7 @@ function parseTemplateLiteral(text) {
 /**
  * Parse a paragraph into a statement
  */
-function parseParagraph(node) {
+function parseParagraph(node: MdastNode): Statement | null {
   const children = node.children || [];
 
   // Check for print statement: **{expr}**, **text**, or **template {expr} string**
@@ -161,26 +182,27 @@ function parseParagraph(node) {
     // Check for template string with embedded expressions
     if (strongText.includes('{') && strongText.includes('}')) {
       const parts = parseTemplateLiteral(strongText);
+      const templateExpr: TemplateLiteralExpression = { type: 'TemplateLiteral', parts };
       return {
         type: 'PrintStatement',
-        expression: { type: 'TemplateLiteral', parts }
+        expression: templateExpr
       };
     }
     // Otherwise treat as literal string
     return {
       type: 'PrintStatement',
-      expression: { type: 'Literal', value: strongText }
+      expression: { type: 'Literal', value: strongText } as Expression
     };
   }
 
   // Check for function call: [args](#func) or [args](file.md#func)
   if (children.length === 1 && children[0].type === 'link') {
-    const link = children[0];
+    const link = children[0] as MdastNode & { url: string };
     const argsText = extractText(link);
     const args = argsText ? argsText.split(',').map(a => parseExpression(a.trim())) : [];
 
-    let functionName;
-    let externalFile = null;
+    let functionName: string;
+    let externalFile: string | null = null;
 
     if (link.url.startsWith('#')) {
       // Internal call: #function-name
@@ -213,7 +235,7 @@ function parseParagraph(node) {
     return {
       type: 'AssignmentStatement',
       variable: varName,
-      operator: operator || null,
+      operator: (operator as '+' | '-' | '*' | '/') || null,
       value: parseExpression(valueStr)
     };
   }

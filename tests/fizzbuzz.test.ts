@@ -3,13 +3,14 @@ import assert from 'node:assert';
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { parse } from '../src/parser/index.js';
-import { interpret } from '../src/interpreter/index.js';
+import { parse } from '../src/parser/index.ts';
+import { interpret } from '../src/interpreter/index.ts';
+import type { RuntimeValue } from '../src/types.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const examplesDir = resolve(__dirname, '../examples');
 
-function runFizzbuzz() {
+function runFizzbuzz(): RuntimeValue[] {
   const md = readFileSync(resolve(examplesDir, 'fizzbuzz.md'), 'utf-8');
   const program = parse(md);
   return interpret(program, 'main', [], examplesDir);

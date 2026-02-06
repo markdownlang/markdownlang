@@ -1,10 +1,10 @@
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { createInterface } from 'readline';
-import { parse } from './parser/index.js';
-import { interpretAsync } from './interpreter/index.js';
+import { parse } from './parser/index.ts';
+import { interpretAsync } from './interpreter/index.ts';
 
-function main() {
+function main(): void {
   const args = process.argv.slice(2);
 
   if (args.length === 0) {
@@ -26,7 +26,7 @@ function main() {
   });
 
   // Input reader function that prompts user
-  const inputReader = () => {
+  const inputReader = (): Promise<string> => {
     return new Promise((resolve) => {
       rl.question('', (answer) => {
         resolve(answer);
@@ -35,7 +35,7 @@ function main() {
   };
 
   // Print handler for immediate output
-  const printHandler = (value) => {
+  const printHandler = (value: unknown): void => {
     console.log(value);
   };
 
@@ -43,7 +43,7 @@ function main() {
     .then(() => {
       rl.close();
     })
-    .catch((error) => {
+    .catch((error: Error) => {
       console.error(`Error: ${error.message}`);
       rl.close();
       process.exit(1);
