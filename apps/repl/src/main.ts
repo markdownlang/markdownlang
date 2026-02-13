@@ -231,6 +231,7 @@ function renderGutter(): void {
 
 editor.addEventListener("scroll", () => {
   scopeBg.style.top = -editor.scrollTop + "px";
+  scopeBg.style.left = -editor.scrollLeft + "px";
 });
 
 editor.addEventListener("input", renderGutter);
@@ -242,7 +243,10 @@ function loadProject(key: string): void {
   activeFileIndex = 0;
   editor.value = currentFiles[0].content;
   renderGutter();
-  toggleMode("preview");
+  if (previewMode) {
+    preview.innerHTML = marked(editor.value) as string;
+    preview.style.fontFamily = FONT_MAP[fontSelect.value] || FONT_MAP.serif;
+  }
   renderTabs();
 }
 
@@ -397,6 +401,7 @@ function downloadFile(): void {
 }
 
 loadProject("hello-world");
+toggleMode("preview");
 
 examplesSelect.addEventListener("change", () => {
   loadProject(examplesSelect.value);

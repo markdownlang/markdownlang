@@ -386,6 +386,7 @@ main {
   resize: none;
   border: none;
   outline: none;
+  white-space: pre;
   padding: 1rem 1rem 1rem 32px;
   font-family: var(--font-mono);
   font-size: 0.9rem;
