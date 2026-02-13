@@ -9,6 +9,7 @@
 # check
 
 1. word
+
 - reversed = ""
 - i = 0
 - len = word.length
@@ -22,7 +23,7 @@
 1. i
 1. len
 
-## *i >= len*
+## _i >= len_
 
 [word, reversed](#compare)
 
@@ -37,7 +38,7 @@ reversed += word[len - 1 - i]
 1. original
 1. reversed
 
-## *original == reversed*
+## _original == reversed_
 
 **{original} is a palindrome!**
 

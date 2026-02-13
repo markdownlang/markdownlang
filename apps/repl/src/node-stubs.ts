@@ -13,16 +13,16 @@ export function clearFiles(): void {
 
 function normalizePath(p: string): string {
   // Collapse ../ and ./ segments
-  const parts = p.split('/').filter(Boolean);
+  const parts = p.split("/").filter(Boolean);
   const resolved: string[] = [];
   for (const part of parts) {
-    if (part === '..') {
+    if (part === "..") {
       resolved.pop();
-    } else if (part !== '.') {
+    } else if (part !== ".") {
       resolved.push(part);
     }
   }
-  return '/' + resolved.join('/');
+  return "/" + resolved.join("/");
 }
 
 export function readFileSync(path: string): string {
@@ -31,15 +31,17 @@ export function readFileSync(path: string): string {
   if (content !== undefined) {
     return content;
   }
-  throw new Error(`File imports are not supported in the web REPL. File not found: ${path}`);
+  throw new Error(
+    `File imports are not supported in the web REPL. File not found: ${path}`,
+  );
 }
 
 export function resolve(...segments: string[]): string {
-  return normalizePath(segments.join('/'));
+  return normalizePath(segments.join("/"));
 }
 
 export function dirname(p: string): string {
-  const parts = p.split('/');
+  const parts = p.split("/");
   parts.pop();
-  return parts.join('/') || '/';
+  return parts.join("/") || "/";
 }

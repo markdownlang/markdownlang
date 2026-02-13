@@ -1,4 +1,4 @@
-import jsep, { type Expression } from 'jsep';
+import jsep, { type Expression } from "jsep";
 
 /**
  * Parse an expression string into an AST using jsep

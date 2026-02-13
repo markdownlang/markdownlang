@@ -14,5 +14,11 @@
     "./remote-file-import/import-test.md": "./src/remote-file-import/import-test.md",
     "./errors/type-error.md": "./src/errors/type-error.md",
     "./errors/undeclared-error.md": "./src/errors/undeclared-error.md"
+  },
+  "scripts": {
+    "lint": "prettier --write src/"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1"
   }
 }

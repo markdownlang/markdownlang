@@ -6,7 +6,8 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
-    "check-types": "turbo check-types"
+    "check-types": "turbo check-types",
+    "lint": "turbo lint"
   },
   "pnpm": {
     "onlyBuiltDependencies": ["esbuild"]

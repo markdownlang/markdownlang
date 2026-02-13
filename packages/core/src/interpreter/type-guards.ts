@@ -1,4 +1,4 @@
-import type { RuntimeValue } from '../types.ts';
+import type { RuntimeValue } from "../types.ts";
 
 /**
  * Custom error for runtime type mismatches
@@ -6,7 +6,7 @@ import type { RuntimeValue } from '../types.ts';
 export class RuntimeTypeError extends Error {
   constructor(message: string, line?: number) {
     super(line ? `Line ${line}: ${message}` : message);
-    this.name = 'RuntimeTypeError';
+    this.name = "RuntimeTypeError";
   }
 }
 
@@ -17,24 +17,28 @@ export class UndeclaredVariableError extends Error {
   constructor(variableName: string, line?: number) {
     const message = `Variable '${variableName}' is not declared. Use '- ${variableName} = value' to declare it.`;
     super(line ? `Line ${line}: ${message}` : message);
-    this.name = 'UndeclaredVariableError';
+    this.name = "UndeclaredVariableError";
   }
 }
 
 /**
  * Validate that a value is a number
  */
-export function expectNumber(value: RuntimeValue, context: string, line?: number): number {
-  if (typeof value === 'string') {
+export function expectNumber(
+  value: RuntimeValue,
+  context: string,
+  line?: number,
+): number {
+  if (typeof value === "string") {
     const num = Number(value);
     if (!isNaN(num)) {
       return num;
     }
   }
-  if (typeof value !== 'number') {
+  if (typeof value !== "number") {
     throw new RuntimeTypeError(
       `Expected number for ${context}, got ${typeof value} (${value})`,
-      line
+      line,
     );
   }
   return value;
@@ -43,14 +47,18 @@ export function expectNumber(value: RuntimeValue, context: string, line?: number
 /**
  * Validate that a value is a string
  */
-export function expectString(value: RuntimeValue, context: string, line?: number): string {
-  if (typeof value === 'number') {
+export function expectString(
+  value: RuntimeValue,
+  context: string,
+  line?: number,
+): string {
+  if (typeof value === "number") {
     return String(value);
   }
-  if (typeof value !== 'string') {
+  if (typeof value !== "string") {
     throw new RuntimeTypeError(
       `Expected string for ${context}, got ${typeof value} (${value})`,
-      line
+      line,
     );
   }
   return value;
@@ -59,16 +67,20 @@ export function expectString(value: RuntimeValue, context: string, line?: number
 /**
  * Validate that a value is a string or number (for member access index)
  */
-export function expectStringOrNumber(value: RuntimeValue, context: string, line?: number): string | number {
-  if (typeof value === 'string' || typeof value === 'number') {
+export function expectStringOrNumber(
+  value: RuntimeValue,
+  context: string,
+  line?: number,
+): string | number {
+  if (typeof value === "string" || typeof value === "number") {
     return value;
   }
-  if (typeof value === 'boolean') {
+  if (typeof value === "boolean") {
     return Number(value);
   }
   throw new RuntimeTypeError(
     `Expected string or number for ${context}, got ${typeof value} (${value})`,
-    line
+    line,
   );
 }
 
@@ -78,16 +90,16 @@ export function expectStringOrNumber(value: RuntimeValue, context: string, line?
 export function expectIndexable(
   value: RuntimeValue,
   context: string,
-  line?: number
+  line?: number,
 ): string | Record<string | number, RuntimeValue> {
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return value;
   }
-  if (value !== null && value !== undefined && typeof value === 'object') {
+  if (value !== null && value !== undefined && typeof value === "object") {
     return value as Record<string | number, RuntimeValue>;
   }
   throw new RuntimeTypeError(
     `Expected string or object for ${context}, got ${typeof value} (${value})`,
-    line
+    line,
   );
 }

@@ -1,20 +1,20 @@
-import type { Expression } from 'jsep';
+import type { Expression } from "jsep";
 
 // Control flow symbols
-export const TAIL_CALL: unique symbol = Symbol('TailCall');
-export const ASYNC_INPUT: unique symbol = Symbol('AsyncInput');
+export const TAIL_CALL: unique symbol = Symbol("TailCall");
+export const ASYNC_INPUT: unique symbol = Symbol("AsyncInput");
 
 // Runtime value type
 export type RuntimeValue = string | number | boolean | null | undefined;
 
 // Template literal parts
 export interface LiteralPart {
-  type: 'literal';
+  type: "literal";
   value: string;
 }
 
 export interface ExpressionPart {
-  type: 'expression';
+  type: "expression";
   expr: Expression;
 }
 
@@ -22,7 +22,7 @@ export type TemplatePart = LiteralPart | ExpressionPart;
 
 // Custom expression type for template literals
 export interface TemplateLiteralExpression {
-  type: 'TemplateLiteral';
+  type: "TemplateLiteral";
   parts: TemplatePart[];
 }
 
@@ -33,21 +33,21 @@ export interface SourceLocation {
 
 // Statement types
 export interface PrintStatement {
-  type: 'PrintStatement';
+  type: "PrintStatement";
   expression: Expression | TemplateLiteralExpression;
   line?: number;
 }
 
 export interface AssignmentStatement {
-  type: 'AssignmentStatement';
+  type: "AssignmentStatement";
   variable: string;
-  operator: '+' | '-' | '*' | '/' | null;
+  operator: "+" | "-" | "*" | "/" | null;
   value: Expression;
   line?: number;
 }
 
 export interface FunctionCallStatement {
-  type: 'FunctionCallStatement';
+  type: "FunctionCallStatement";
   functionName: string;
   externalFile: string | null;
   arguments: Expression[];
@@ -55,25 +55,25 @@ export interface FunctionCallStatement {
 }
 
 export interface ConditionalBlock {
-  type: 'ConditionalBlock';
+  type: "ConditionalBlock";
   condition: Expression;
   body: Statement[];
   line?: number;
 }
 
 export interface BreakStatement {
-  type: 'BreakStatement';
+  type: "BreakStatement";
   line?: number;
 }
 
 export interface InputStatement {
-  type: 'InputStatement';
+  type: "InputStatement";
   variable: string;
   line?: number;
 }
 
 export interface VariableDeclaration {
-  type: 'VariableDeclaration';
+  type: "VariableDeclaration";
   variable: string;
   value: Expression;
   line?: number;
@@ -90,7 +90,7 @@ export type Statement =
 
 // Function declaration
 export interface FunctionDeclaration {
-  type: 'FunctionDeclaration';
+  type: "FunctionDeclaration";
   name: string;
   parameters: string[];
   body: Statement[];
@@ -98,7 +98,7 @@ export interface FunctionDeclaration {
 
 // Program structure
 export interface Program {
-  type: 'Program';
+  type: "Program";
   functions: Record<string, FunctionDeclaration>;
   _baseDir?: string;
 }

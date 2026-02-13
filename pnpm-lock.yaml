@@ -43,6 +43,9 @@ importers:
       '@types/node':
         specifier: ^25.2.1
         version: 25.2.1
+      prettier:
+        specifier: ^3.8.1
+        version: 3.8.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -71,11 +74,18 @@ importers:
       '@types/node':
         specifier: ^25.2.1
         version: 25.2.1
+      prettier:
+        specifier: ^3.8.1
+        version: 3.8.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/examples: {}
+  packages/examples:
+    devDependencies:
+      prettier:
+        specifier: ^3.8.1
+        version: 3.8.1
 
 packages:
 
@@ -686,6 +696,11 @@ packages:
   postcss@8.5.6:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
+
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   remark-parse@11.0.0:
     resolution: {integrity: sha512-FCxlKLNGknS5ba/1lmpYijMUzX2esxW5xQqjWxw2eHFfS2MSdaHVINFmhjo+qN1WhZhNimq0dZATN9pH0IDrpA==}
@@ -1309,6 +1324,8 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  prettier@3.8.1: {}
 
   remark-parse@11.0.0:
     dependencies:

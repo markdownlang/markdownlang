@@ -1,11 +1,14 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
-import { parse } from '../src/parser/index.ts';
-import { interpret } from '../src/interpreter/index.ts';
-import { RuntimeTypeError, UndeclaredVariableError } from '../src/interpreter/type-guards.ts';
+import { test, describe } from "node:test";
+import assert from "node:assert";
+import { parse } from "../src/parser/index.ts";
+import { interpret } from "../src/interpreter/index.ts";
+import {
+  RuntimeTypeError,
+  UndeclaredVariableError,
+} from "../src/interpreter/type-guards.ts";
 
-describe('runtime type errors', () => {
-  test('subtraction with string throws RuntimeTypeError with line number', () => {
+describe("runtime type errors", () => {
+  test("subtraction with string throws RuntimeTypeError with line number", () => {
     const markdown = `# main
 
 - x = "hello"
@@ -16,13 +19,16 @@ describe('runtime type errors', () => {
       () => interpret(program),
       (err: Error) => {
         assert(err instanceof RuntimeTypeError);
-        assert.strictEqual(err.message, 'Line 4: Expected number for left operand of -, got string (hello)');
+        assert.strictEqual(
+          err.message,
+          "Line 4: Expected number for left operand of -, got string (hello)",
+        );
         return true;
-      }
+      },
     );
   });
 
-  test('multiplication with string throws RuntimeTypeError', () => {
+  test("multiplication with string throws RuntimeTypeError", () => {
     const markdown = `# main
 
 - a = 10
@@ -33,13 +39,16 @@ describe('runtime type errors', () => {
       () => interpret(program),
       (err: Error) => {
         assert(err instanceof RuntimeTypeError);
-        assert.match(err.message, /Line 4:.*Expected number for right operand of \*/);
+        assert.match(
+          err.message,
+          /Line 4:.*Expected number for right operand of \*/,
+        );
         return true;
-      }
+      },
     );
   });
 
-  test('division with boolean throws RuntimeTypeError', () => {
+  test("division with boolean throws RuntimeTypeError", () => {
     const markdown = `# main
 
 - x = 10 / true
@@ -51,11 +60,11 @@ describe('runtime type errors', () => {
         assert(err instanceof RuntimeTypeError);
         assert.match(err.message, /Expected number for right operand of \//);
         return true;
-      }
+      },
     );
   });
 
-  test('comparison operators require numbers', () => {
+  test("comparison operators require numbers", () => {
     const markdown = `# main
 
 - result = "a" < "b"
@@ -67,11 +76,11 @@ describe('runtime type errors', () => {
         assert(err instanceof RuntimeTypeError);
         assert.match(err.message, /Expected number for left operand of </);
         return true;
-      }
+      },
     );
   });
 
-  test('unary minus requires number', () => {
+  test("unary minus requires number", () => {
     const markdown = `# main
 
 - x = "hello"
@@ -82,13 +91,16 @@ describe('runtime type errors', () => {
       () => interpret(program),
       (err: Error) => {
         assert(err instanceof RuntimeTypeError);
-        assert.match(err.message, /Line 4:.*Expected number for operand of unary -/);
+        assert.match(
+          err.message,
+          /Line 4:.*Expected number for operand of unary -/,
+        );
         return true;
-      }
+      },
     );
   });
 
-  test('compound subtraction assignment requires numbers', () => {
+  test("compound subtraction assignment requires numbers", () => {
     const markdown = `# main
 
 - x = "hello"
@@ -102,11 +114,11 @@ x -= 5
         assert(err instanceof RuntimeTypeError);
         assert.match(err.message, /Line 5:.*Expected number for variable 'x'/);
         return true;
-      }
+      },
     );
   });
 
-  test('compound multiplication assignment requires numbers', () => {
+  test("compound multiplication assignment requires numbers", () => {
     const markdown = `# main
 
 - x = 10
@@ -118,13 +130,16 @@ x *= "bad"
       () => interpret(program),
       (err: Error) => {
         assert(err instanceof RuntimeTypeError);
-        assert.match(err.message, /Line 5:.*Expected number for assignment value/);
+        assert.match(
+          err.message,
+          /Line 5:.*Expected number for assignment value/,
+        );
         return true;
-      }
+      },
     );
   });
 
-  test('string concatenation with + does not throw', () => {
+  test("string concatenation with + does not throw", () => {
     const markdown = `# main
 
 - x = "hello"
@@ -134,10 +149,10 @@ x *= "bad"
 `;
     const program = parse(markdown);
     const result = interpret(program);
-    assert.deepStrictEqual(result, ['hello world']);
+    assert.deepStrictEqual(result, ["hello world"]);
   });
 
-  test('string concatenation with += does not throw', () => {
+  test("string concatenation with += does not throw", () => {
     const markdown = `# main
 
 - text = "hello"
@@ -148,10 +163,10 @@ text += " world"
 `;
     const program = parse(markdown);
     const result = interpret(program);
-    assert.deepStrictEqual(result, ['hello world']);
+    assert.deepStrictEqual(result, ["hello world"]);
   });
 
-  test('number + string coerces to string', () => {
+  test("number + string coerces to string", () => {
     const markdown = `# main
 
 - x = 42
@@ -161,10 +176,10 @@ text += " world"
 `;
     const program = parse(markdown);
     const result = interpret(program);
-    assert.deepStrictEqual(result, ['42 is the answer']);
+    assert.deepStrictEqual(result, ["42 is the answer"]);
   });
 
-  test('error in conditional block includes line number', () => {
+  test("error in conditional block includes line number", () => {
     const markdown = `# main
 
 - x = "text"
@@ -180,11 +195,11 @@ text += " world"
         assert(err instanceof RuntimeTypeError);
         assert.match(err.message, /Line 5:.*Expected number/);
         return true;
-      }
+      },
     );
   });
 
-  test('error in function call argument includes line number', () => {
+  test("error in function call argument includes line number", () => {
     const markdown = `# main
 
 [10 - "bad"](#helper)
@@ -202,11 +217,11 @@ text += " world"
         assert(err instanceof RuntimeTypeError);
         assert.match(err.message, /Line 3:.*Expected number/);
         return true;
-      }
+      },
     );
   });
 
-  test('undeclared variable assignment throws UndeclaredVariableError', () => {
+  test("undeclared variable assignment throws UndeclaredVariableError", () => {
     const markdown = `# main
 
 x = 5
@@ -218,11 +233,11 @@ x = 5
         assert(err instanceof UndeclaredVariableError);
         assert.match(err.message, /Variable 'x' is not declared/);
         return true;
-      }
+      },
     );
   });
 
-  test('variable declaration with list syntax works', () => {
+  test("variable declaration with list syntax works", () => {
     const markdown = `# main
 
 - x = 5
@@ -236,7 +251,7 @@ x = 5
     assert.deepStrictEqual(result, [15]);
   });
 
-  test('assignment to declared variable works', () => {
+  test("assignment to declared variable works", () => {
     const markdown = `# main
 
 - x = 5

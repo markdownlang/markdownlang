@@ -1,19 +1,22 @@
-import { parse } from '@markdownlang/core/parser';
-import { interpretAsync, clearExternalProgramCache } from '@markdownlang/core/interpreter';
-import type { RuntimeValue } from '@markdownlang/core/types';
-import { registerFile, clearFiles } from './node-stubs.ts';
-import { marked } from 'marked';
+import { parse } from "@markdownlang/core/parser";
+import {
+  interpretAsync,
+  clearExternalProgramCache,
+} from "@markdownlang/core/interpreter";
+import type { RuntimeValue } from "@markdownlang/core/types";
+import { registerFile, clearFiles } from "./node-stubs.ts";
+import { marked } from "marked";
 
-import fizzbuzz from '@markdownlang/examples/fizzbuzz.md?raw';
-import helloWorld from '@markdownlang/examples/hello-world.md?raw';
-import palindrome from '@markdownlang/examples/palindrome.md?raw';
-import kitchenSink from '@markdownlang/examples/kitchen-sink.md?raw';
-import fileImport from '@markdownlang/examples/file-import/import-test.md?raw';
-import fileImportLib from '@markdownlang/examples/file-import/lib.md?raw';
-import remoteFileImport from '@markdownlang/examples/remote-file-import/import-test.md?raw';
-import typeError from '@markdownlang/examples/errors/type-error.md?raw';
-import undeclaredError from '@markdownlang/examples/errors/undeclared-error.md?raw';
-import nestedConditionals from '@markdownlang/examples/nested-conditionals.md?raw';
+import fizzbuzz from "@markdownlang/examples/fizzbuzz.md?raw";
+import helloWorld from "@markdownlang/examples/hello-world.md?raw";
+import palindrome from "@markdownlang/examples/palindrome.md?raw";
+import kitchenSink from "@markdownlang/examples/kitchen-sink.md?raw";
+import fileImport from "@markdownlang/examples/file-import/import-test.md?raw";
+import fileImportLib from "@markdownlang/examples/file-import/lib.md?raw";
+import remoteFileImport from "@markdownlang/examples/remote-file-import/import-test.md?raw";
+import typeError from "@markdownlang/examples/errors/type-error.md?raw";
+import undeclaredError from "@markdownlang/examples/errors/undeclared-error.md?raw";
+import nestedConditionals from "@markdownlang/examples/nested-conditionals.md?raw";
 
 interface Project {
   entry: string;
@@ -21,63 +24,95 @@ interface Project {
 }
 
 const EXAMPLES: Record<string, Project> = {
-  'hello-world': {
-    entry: '/hello-world.md',
-    files: [{ name: 'hello-world.md', path: '/hello-world.md', content: helloWorld }],
-  },
-  'kitchen-sink': {
-    entry: '/kitchen-sink.md',
-    files: [{ name: 'kitchen-sink.md', path: '/kitchen-sink.md', content: kitchenSink }],
-  },
-  'fizzbuzz': {
-    entry: '/fizzbuzz.md',
-    files: [{ name: 'fizzbuzz.md', path: '/fizzbuzz.md', content: fizzbuzz }],
-  },
-  'palindrome': {
-    entry: '/palindrome.md',
-    files: [{ name: 'palindrome.md', path: '/palindrome.md', content: palindrome }],
-  },
-  'nested-conditionals': {
-    entry: '/nested-conditionals.md',
-    files: [{ name: 'nested-conditionals.md', path: '/nested-conditionals.md', content: nestedConditionals }],
-  },
-  'file-import': {
-    entry: '/import-test.md',
+  "hello-world": {
+    entry: "/hello-world.md",
     files: [
-      { name: 'import-test.md', path: '/import-test.md', content: fileImport },
-      { name: 'lib.md', path: '/lib.md', content: fileImportLib },
+      { name: "hello-world.md", path: "/hello-world.md", content: helloWorld },
     ],
   },
-  'remote-file-import': {
-    entry: '/import-test.md',
-    files: [{ name: 'import-test.md', path: '/import-test.md', content: remoteFileImport }],
+  "kitchen-sink": {
+    entry: "/kitchen-sink.md",
+    files: [
+      {
+        name: "kitchen-sink.md",
+        path: "/kitchen-sink.md",
+        content: kitchenSink,
+      },
+    ],
   },
-  'type-error': {
-    entry: '/type-error.md',
-    files: [{ name: 'type-error.md', path: '/type-error.md', content: typeError }],
+  fizzbuzz: {
+    entry: "/fizzbuzz.md",
+    files: [{ name: "fizzbuzz.md", path: "/fizzbuzz.md", content: fizzbuzz }],
   },
-  'undeclared-error': {
-    entry: '/undeclared-error.md',
-    files: [{ name: 'undeclared-error.md', path: '/undeclared-error.md', content: undeclaredError }],
+  palindrome: {
+    entry: "/palindrome.md",
+    files: [
+      { name: "palindrome.md", path: "/palindrome.md", content: palindrome },
+    ],
+  },
+  "nested-conditionals": {
+    entry: "/nested-conditionals.md",
+    files: [
+      {
+        name: "nested-conditionals.md",
+        path: "/nested-conditionals.md",
+        content: nestedConditionals,
+      },
+    ],
+  },
+  "file-import": {
+    entry: "/import-test.md",
+    files: [
+      { name: "import-test.md", path: "/import-test.md", content: fileImport },
+      { name: "lib.md", path: "/lib.md", content: fileImportLib },
+    ],
+  },
+  "remote-file-import": {
+    entry: "/import-test.md",
+    files: [
+      {
+        name: "import-test.md",
+        path: "/import-test.md",
+        content: remoteFileImport,
+      },
+    ],
+  },
+  "type-error": {
+    entry: "/type-error.md",
+    files: [
+      { name: "type-error.md", path: "/type-error.md", content: typeError },
+    ],
+  },
+  "undeclared-error": {
+    entry: "/undeclared-error.md",
+    files: [
+      {
+        name: "undeclared-error.md",
+        path: "/undeclared-error.md",
+        content: undeclaredError,
+      },
+    ],
   },
 };
 
-const editor = document.getElementById('editor') as HTMLTextAreaElement;
-const preview = document.getElementById('preview') as HTMLDivElement;
-const output = document.getElementById('output') as HTMLDivElement;
-const runBtn = document.getElementById('run') as HTMLButtonElement;
-const examplesSelect = document.getElementById('examples') as HTMLSelectElement;
-const tabBar = document.getElementById('tab-bar') as HTMLDivElement;
-const viewToggle = document.getElementById('view-toggle') as HTMLDivElement;
-const fontSelect = document.getElementById('font-select') as HTMLSelectElement;
-const scopeBg = document.getElementById('scope-bg') as HTMLDivElement;
-const editorContainer = document.getElementById('editor-container') as HTMLDivElement;
+const editor = document.getElementById("editor") as HTMLTextAreaElement;
+const preview = document.getElementById("preview") as HTMLDivElement;
+const output = document.getElementById("output") as HTMLDivElement;
+const runBtn = document.getElementById("run") as HTMLButtonElement;
+const examplesSelect = document.getElementById("examples") as HTMLSelectElement;
+const tabBar = document.getElementById("tab-bar") as HTMLDivElement;
+const viewToggle = document.getElementById("view-toggle") as HTMLDivElement;
+const fontSelect = document.getElementById("font-select") as HTMLSelectElement;
+const scopeBg = document.getElementById("scope-bg") as HTMLDivElement;
+const editorContainer = document.getElementById(
+  "editor-container",
+) as HTMLDivElement;
 
 const FONT_MAP: Record<string, string> = {
-  serif: 'var(--font-serif)',
-  sans: 'var(--font-sans)',
-  mono: 'var(--font-mono)',
-  hand: 'var(--font-hand)',
+  serif: "var(--font-serif)",
+  sans: "var(--font-sans)",
+  mono: "var(--font-mono)",
+  hand: "var(--font-hand)",
   barcode: "'Libre Barcode 39 Extended', system-ui",
   lines: "'Linefont', sans-serif",
   waves: "'Wavefont', sans-serif",
@@ -87,36 +122,38 @@ let currentFiles: { name: string; path: string; content: string }[] = [];
 let activeFileIndex = 0;
 let previewMode = false;
 
-function toggleMode(mode: 'edit' | 'preview'): void {
-  previewMode = mode === 'preview';
-  const buttons = viewToggle.querySelectorAll('.view-toggle-btn');
-  buttons.forEach(btn => {
-    btn.classList.toggle('active', (btn as HTMLElement).dataset.mode === mode);
+function toggleMode(mode: "edit" | "preview"): void {
+  previewMode = mode === "preview";
+  const buttons = viewToggle.querySelectorAll(".view-toggle-btn");
+  buttons.forEach((btn) => {
+    btn.classList.toggle("active", (btn as HTMLElement).dataset.mode === mode);
   });
 
   if (previewMode) {
     currentFiles[activeFileIndex].content = editor.value;
     preview.innerHTML = marked(editor.value) as string;
     preview.style.fontFamily = FONT_MAP[fontSelect.value] || FONT_MAP.serif;
-    editorContainer.style.display = 'none';
-    preview.style.display = '';
+    editorContainer.style.display = "none";
+    preview.style.display = "";
   } else {
-    editorContainer.style.display = '';
-    preview.style.display = 'none';
+    editorContainer.style.display = "";
+    preview.style.display = "none";
     renderGutter();
   }
 }
 
-viewToggle.addEventListener('click', (e) => {
-  const btn = (e.target as HTMLElement).closest('.view-toggle-btn') as HTMLElement | null;
+viewToggle.addEventListener("click", (e) => {
+  const btn = (e.target as HTMLElement).closest(
+    ".view-toggle-btn",
+  ) as HTMLElement | null;
   if (!btn) return;
-  const mode = btn.dataset.mode as 'edit' | 'preview';
-  if ((mode === 'preview') !== previewMode) {
+  const mode = btn.dataset.mode as "edit" | "preview";
+  if ((mode === "preview") !== previewMode) {
     toggleMode(mode);
   }
 });
 
-const title = document.querySelector('header h1') as HTMLElement;
+const title = document.querySelector("header h1") as HTMLElement;
 
 function applyFont(value: string): void {
   const font = FONT_MAP[value] || FONT_MAP.serif;
@@ -126,12 +163,12 @@ function applyFont(value: string): void {
   }
 }
 
-fontSelect.addEventListener('change', () => {
+fontSelect.addEventListener("change", () => {
   applyFont(fontSelect.value);
 });
 
 function computeScopes(text: string): number[] {
-  const lines = text.split('\n');
+  const lines = text.split("\n");
   const depths: number[] = [];
   let depth = 0;
   let isFirstFunction = true;
@@ -145,7 +182,7 @@ function computeScopes(text: string): number[] {
         if (!isFirstFunction) {
           // Walk back and set preceding blank lines to 0 (gap between functions)
           for (let i = depths.length - 1; i >= 0; i--) {
-            if (lines[i].trim() === '') {
+            if (lines[i].trim() === "") {
               depths[i] = 0;
             } else {
               break;
@@ -168,12 +205,12 @@ function computeScopes(text: string): number[] {
   return depths;
 }
 
-const BAR_PAD = 6;   // left offset for first bar
-const BAR_STEP = 5;  // spacing per level (bar width + gap)
+const BAR_PAD = 6; // left offset for first bar
+const BAR_STEP = 5; // spacing per level (bar width + gap)
 
 function renderGutter(): void {
   const depths = computeScopes(editor.value);
-  let html = '';
+  let html = "";
   for (const d of depths) {
     html += '<div class="scope-bg-line">';
     for (let level = 1; level <= d; level++) {
@@ -187,52 +224,52 @@ function renderGutter(): void {
         html += `<span class="scope-bg-band level-${level}" style="left:${left}px;width:${BAR_STEP}px"></span>`;
       }
     }
-    html += '</div>';
+    html += "</div>";
   }
   scopeBg.innerHTML = html;
 }
 
-editor.addEventListener('scroll', () => {
-  scopeBg.style.top = -editor.scrollTop + 'px';
+editor.addEventListener("scroll", () => {
+  scopeBg.style.top = -editor.scrollTop + "px";
 });
 
-editor.addEventListener('input', renderGutter);
+editor.addEventListener("input", renderGutter);
 
 function loadProject(key: string): void {
   const project = EXAMPLES[key];
   if (!project) return;
-  currentFiles = project.files.map(f => ({ ...f }));
+  currentFiles = project.files.map((f) => ({ ...f }));
   activeFileIndex = 0;
   editor.value = currentFiles[0].content;
   renderGutter();
-  toggleMode('preview');
+  toggleMode("preview");
   renderTabs();
 }
 
 function renderTabs(): void {
-  tabBar.innerHTML = '';
+  tabBar.innerHTML = "";
   currentFiles.forEach((file, i) => {
-    const tab = document.createElement('button');
-    tab.className = 'tab' + (i === activeFileIndex ? ' active' : '');
+    const tab = document.createElement("button");
+    tab.className = "tab" + (i === activeFileIndex ? " active" : "");
 
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'tab-name';
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "tab-name";
     nameSpan.textContent = file.name;
     tab.appendChild(nameSpan);
 
     if (currentFiles.length > 1) {
-      const close = document.createElement('span');
-      close.className = 'tab-close';
-      close.innerHTML = '&times;';
-      close.addEventListener('click', (e) => {
+      const close = document.createElement("span");
+      close.className = "tab-close";
+      close.innerHTML = "&times;";
+      close.addEventListener("click", (e) => {
         e.stopPropagation();
         removeFile(i);
       });
       tab.appendChild(close);
     }
 
-    tab.addEventListener('click', () => switchTab(i));
-    nameSpan.addEventListener('dblclick', (e) => {
+    tab.addEventListener("click", () => switchTab(i));
+    nameSpan.addEventListener("dblclick", (e) => {
       e.stopPropagation();
       startRename(i, tab, nameSpan);
     });
@@ -240,20 +277,20 @@ function renderTabs(): void {
     tabBar.appendChild(tab);
   });
 
-  const addBtn = document.createElement('button');
-  addBtn.className = 'tab-add';
-  addBtn.textContent = '+';
-  addBtn.addEventListener('click', addFile);
+  const addBtn = document.createElement("button");
+  addBtn.className = "tab-add";
+  addBtn.textContent = "+";
+  addBtn.addEventListener("click", addFile);
   tabBar.appendChild(addBtn);
 
-  const spacer = document.createElement('div');
-  spacer.className = 'tab-spacer';
+  const spacer = document.createElement("div");
+  spacer.className = "tab-spacer";
   tabBar.appendChild(spacer);
 
-  const downloadBtn = document.createElement('button');
-  downloadBtn.className = 'tab-download';
-  downloadBtn.textContent = '\u2193 Download';
-  downloadBtn.addEventListener('click', downloadFile);
+  const downloadBtn = document.createElement("button");
+  downloadBtn.className = "tab-download";
+  downloadBtn.textContent = "\u2193 Download";
+  downloadBtn.addEventListener("click", downloadFile);
   tabBar.appendChild(downloadBtn);
 }
 
@@ -263,22 +300,22 @@ function switchTab(index: number): void {
   activeFileIndex = index;
   editor.value = currentFiles[index].content;
   renderGutter();
-  if (previewMode) toggleMode('edit');
+  if (previewMode) toggleMode("edit");
   renderTabs();
 }
 
 function addFile(): void {
   currentFiles[activeFileIndex].content = editor.value;
-  const existingNames = new Set(currentFiles.map(f => f.name));
-  let name = 'untitled.md';
+  const existingNames = new Set(currentFiles.map((f) => f.name));
+  let name = "untitled.md";
   let counter = 2;
   while (existingNames.has(name)) {
     name = `untitled-${counter}.md`;
     counter++;
   }
-  currentFiles.push({ name, path: '/' + name, content: '' });
+  currentFiles.push({ name, path: "/" + name, content: "" });
   activeFileIndex = currentFiles.length - 1;
-  editor.value = '';
+  editor.value = "";
   renderTabs();
 }
 
@@ -295,10 +332,14 @@ function removeFile(index: number): void {
   renderTabs();
 }
 
-function startRename(index: number, tabEl: HTMLElement, nameSpan: HTMLSpanElement): void {
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'tab-rename-input';
+function startRename(
+  index: number,
+  tabEl: HTMLElement,
+  nameSpan: HTMLSpanElement,
+): void {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "tab-rename-input";
   input.value = currentFiles[index].name;
   nameSpan.replaceWith(input);
   input.focus();
@@ -311,30 +352,42 @@ function startRename(index: number, tabEl: HTMLElement, nameSpan: HTMLSpanElemen
     renderTabs();
   };
 
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); commit(); }
-    if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      commit();
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      cancel();
+    }
   });
-  input.addEventListener('blur', commit);
+  input.addEventListener("blur", commit);
 }
 
 function renameFile(index: number, rawName: string): void {
   let name = rawName.trim();
-  if (!name) { renderTabs(); return; }
-  if (!name.endsWith('.md')) name += '.md';
+  if (!name) {
+    renderTabs();
+    return;
+  }
+  if (!name.endsWith(".md")) name += ".md";
   const collision = currentFiles.some((f, i) => i !== index && f.name === name);
-  if (collision) { renderTabs(); return; }
+  if (collision) {
+    renderTabs();
+    return;
+  }
   currentFiles[index].name = name;
-  currentFiles[index].path = '/' + name;
+  currentFiles[index].path = "/" + name;
   renderTabs();
 }
 
 function downloadFile(): void {
   currentFiles[activeFileIndex].content = editor.value;
   const file = currentFiles[activeFileIndex];
-  const blob = new Blob([file.content], { type: 'text/markdown' });
+  const blob = new Blob([file.content], { type: "text/markdown" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = file.name;
   document.body.appendChild(a);
@@ -343,12 +396,12 @@ function downloadFile(): void {
   URL.revokeObjectURL(url);
 }
 
-loadProject('hello-world');
+loadProject("hello-world");
 
-examplesSelect.addEventListener('change', () => {
+examplesSelect.addEventListener("change", () => {
   loadProject(examplesSelect.value);
-  output.textContent = '';
-  output.classList.remove('error');
+  output.textContent = "";
+  output.classList.remove("error");
 });
 
 function appendText(text: string) {
@@ -358,19 +411,19 @@ function appendText(text: string) {
 
 function inlineInput(): Promise<string> {
   return new Promise((resolve) => {
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'inline-input';
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "inline-input";
     output.appendChild(input);
     input.focus();
     output.scrollTop = output.scrollHeight;
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
         const value = input.value;
         input.disabled = true;
-        input.classList.add('submitted');
-        appendText('\n');
+        input.classList.add("submitted");
+        appendText("\n");
         resolve(value);
       }
     });
@@ -378,8 +431,8 @@ function inlineInput(): Promise<string> {
 }
 
 async function run() {
-  output.textContent = '';
-  output.classList.remove('error');
+  output.textContent = "";
+  output.classList.remove("error");
 
   // Save current editor content
   currentFiles[activeFileIndex].content = editor.value;
@@ -397,31 +450,32 @@ async function run() {
     const program = parse(source);
 
     const printHandler = (value: RuntimeValue): void => {
-      appendText(String(value) + '\n');
+      appendText(String(value) + "\n");
     };
 
-    await interpretAsync(program, 'main', [], '', inlineInput, printHandler);
+    await interpretAsync(program, "main", [], "", inlineInput, printHandler);
   } catch (err: unknown) {
-    output.classList.add('error');
+    output.classList.add("error");
     appendText(err instanceof Error ? err.message : String(err));
   }
 }
 
-runBtn.addEventListener('click', run);
+runBtn.addEventListener("click", run);
 
-document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
     e.preventDefault();
     run();
   }
 });
 
-editor.addEventListener('keydown', (e) => {
-  if (e.key === 'Tab') {
+editor.addEventListener("keydown", (e) => {
+  if (e.key === "Tab") {
     e.preventDefault();
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
-    editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
+    editor.value =
+      editor.value.substring(0, start) + "  " + editor.value.substring(end);
     editor.selectionStart = editor.selectionEnd = start + 2;
   }
 });

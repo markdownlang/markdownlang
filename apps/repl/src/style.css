@@ -13,10 +13,11 @@
   --accent: #6b5c4d;
   --accent-hover: #8a7464;
   --error: #c44d3f;
-  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
-  --font-serif: Georgia, 'Times New Roman', 'Palatino Linotype', serif;
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-hand: 'Caveat', cursive;
+  --font-mono: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+  --font-serif: Georgia, "Times New Roman", "Palatino Linotype", serif;
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-hand: "Caveat", cursive;
   --scope-1: #8b7355;
   --scope-2: #6b8e6b;
   --scope-3: #7b8daa;
@@ -25,7 +26,8 @@
   --scope-6: #8a9e6e;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
@@ -139,7 +141,9 @@ main {
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .view-toggle-btn.active {
@@ -199,7 +203,9 @@ main {
   flex-shrink: 0;
 }
 
-#tab-bar:empty { display: none; }
+#tab-bar:empty {
+  display: none;
+}
 
 #tab-bar .tab {
   display: flex;
@@ -214,10 +220,14 @@ main {
   border-bottom: 2px solid transparent;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.15s, border-color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
 }
 
-#tab-bar .tab:hover { color: var(--text); }
+#tab-bar .tab:hover {
+  color: var(--text);
+}
 
 #tab-bar .tab.active {
   color: var(--text);
@@ -234,11 +244,17 @@ main {
   color: inherit;
   border-radius: 3px;
   cursor: pointer;
-  transition: opacity 0.15s, background 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
 }
 
-#tab-bar .tab:hover .tab-close { opacity: 1; }
-.tab-close:hover { background: var(--border); }
+#tab-bar .tab:hover .tab-close {
+  opacity: 1;
+}
+.tab-close:hover {
+  background: var(--border);
+}
 
 .tab-rename-input {
   font-family: var(--font-mono);
@@ -263,9 +279,13 @@ main {
   transition: color 0.15s;
 }
 
-.tab-add:hover { color: var(--text); }
+.tab-add:hover {
+  color: var(--text);
+}
 
-.tab-spacer { flex: 1; }
+.tab-spacer {
+  flex: 1;
+}
 
 .tab-download {
   font-family: var(--font-serif);
@@ -279,7 +299,9 @@ main {
   transition: color 0.15s;
 }
 
-.tab-download:hover { color: var(--text); }
+.tab-download:hover {
+  color: var(--text);
+}
 
 #editor-container {
   flex: 1;
@@ -311,12 +333,24 @@ main {
   bottom: 0;
 }
 
-.scope-bg-band.level-1 { background: rgba(139, 115, 85, 0.12); }
-.scope-bg-band.level-2 { background: rgba(107, 142, 107, 0.12); }
-.scope-bg-band.level-3 { background: rgba(123, 141, 170, 0.12); }
-.scope-bg-band.level-4 { background: rgba(160, 125, 160, 0.12); }
-.scope-bg-band.level-5 { background: rgba(196, 131, 110, 0.12); }
-.scope-bg-band.level-6 { background: rgba(138, 158, 110, 0.12); }
+.scope-bg-band.level-1 {
+  background: rgba(139, 115, 85, 0.12);
+}
+.scope-bg-band.level-2 {
+  background: rgba(107, 142, 107, 0.12);
+}
+.scope-bg-band.level-3 {
+  background: rgba(123, 141, 170, 0.12);
+}
+.scope-bg-band.level-4 {
+  background: rgba(160, 125, 160, 0.12);
+}
+.scope-bg-band.level-5 {
+  background: rgba(196, 131, 110, 0.12);
+}
+.scope-bg-band.level-6 {
+  background: rgba(138, 158, 110, 0.12);
+}
 
 .scope-bar {
   position: absolute;
@@ -325,12 +359,24 @@ main {
   width: 2px;
 }
 
-.scope-bar.level-1 { background: var(--scope-1); }
-.scope-bar.level-2 { background: var(--scope-2); }
-.scope-bar.level-3 { background: var(--scope-3); }
-.scope-bar.level-4 { background: var(--scope-4); }
-.scope-bar.level-5 { background: var(--scope-5); }
-.scope-bar.level-6 { background: var(--scope-6); }
+.scope-bar.level-1 {
+  background: var(--scope-1);
+}
+.scope-bar.level-2 {
+  background: var(--scope-2);
+}
+.scope-bar.level-3 {
+  background: var(--scope-3);
+}
+.scope-bar.level-4 {
+  background: var(--scope-4);
+}
+.scope-bar.level-5 {
+  background: var(--scope-5);
+}
+.scope-bar.level-6 {
+  background: var(--scope-6);
+}
 
 #editor {
   position: relative;
@@ -396,24 +442,39 @@ main {
   color: var(--text);
 }
 
-#preview h1, #preview h2, #preview h3,
-#preview h4, #preview h5, #preview h6 {
+#preview h1,
+#preview h2,
+#preview h3,
+#preview h4,
+#preview h5,
+#preview h6 {
   margin: 1em 0 0.5em;
   line-height: 1.3;
 }
 
-#preview h1 { font-size: 1.6rem; }
-#preview h2 { font-size: 1.3rem; }
-#preview h3 { font-size: 1.1rem; }
+#preview h1 {
+  font-size: 1.6rem;
+}
+#preview h2 {
+  font-size: 1.3rem;
+}
+#preview h3 {
+  font-size: 1.1rem;
+}
 
-#preview p { margin: 0.5em 0; }
+#preview p {
+  margin: 0.5em 0;
+}
 
-#preview ul, #preview ol {
+#preview ul,
+#preview ol {
   margin: 0.5em 0;
   padding-left: 1.5em;
 }
 
-#preview li { margin: 0.25em 0; }
+#preview li {
+  margin: 0.25em 0;
+}
 
 #preview code {
   font-family: var(--font-mono);
@@ -454,8 +515,12 @@ main {
   color: var(--muted);
 }
 
-#preview strong { font-weight: 700; }
-#preview em { font-style: italic; }
+#preview strong {
+  font-weight: 700;
+}
+#preview em {
+  font-style: italic;
+}
 
 @media (max-width: 700px) {
   main {

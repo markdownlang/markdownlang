@@ -24,13 +24,13 @@
 
 1. n
 
-## *n > 0*
+## _n > 0_
 
 **{n} is positive**
 
 ---
 
-## *n == 0*
+## _n == 0_
 
 **{n} is zero**
 
@@ -44,7 +44,7 @@
 1. sum
 1. i
 
-## *i > n*
+## _i > n_
 
 **Sum from 1 to {n} is {sum}**
 
@@ -57,6 +57,7 @@ sum += i
 # square
 
 1. n
+
 - result = n \* n
 
 **{n} squared is {result}**

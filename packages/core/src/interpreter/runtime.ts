@@ -4,7 +4,7 @@ import type {
   InputReader,
   PrintHandler,
   RuntimeInterface,
-} from '../types.ts';
+} from "../types.ts";
 
 /**
  * Runtime manages the call stack, variable scopes, and output
@@ -63,12 +63,15 @@ export class Runtime implements RuntimeInterface {
   /**
    * Push a new call frame onto the stack
    */
-  pushFrame(functionName: string, args: Record<string, RuntimeValue> = {}): void {
+  pushFrame(
+    functionName: string,
+    args: Record<string, RuntimeValue> = {},
+  ): void {
     const declaredVariables = new Set<string>(Object.keys(args));
     this.callStack.push({
       functionName,
       variables: { ...args },
-      declaredVariables
+      declaredVariables,
     });
   }
 
