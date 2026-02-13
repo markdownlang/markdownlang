@@ -13,6 +13,7 @@ import fileImportLib from '@markdownlang/examples/file-import/lib.md?raw';
 import remoteFileImport from '@markdownlang/examples/remote-file-import/import-test.md?raw';
 import typeError from '@markdownlang/examples/errors/type-error.md?raw';
 import undeclaredError from '@markdownlang/examples/errors/undeclared-error.md?raw';
+import nestedConditionals from '@markdownlang/examples/nested-conditionals.md?raw';
 
 interface Project {
   entry: string;
@@ -35,6 +36,10 @@ const EXAMPLES: Record<string, Project> = {
   'palindrome': {
     entry: '/palindrome.md',
     files: [{ name: 'palindrome.md', path: '/palindrome.md', content: palindrome }],
+  },
+  'nested-conditionals': {
+    entry: '/nested-conditionals.md',
+    files: [{ name: 'nested-conditionals.md', path: '/nested-conditionals.md', content: nestedConditionals }],
   },
   'file-import': {
     entry: '/import-test.md',
@@ -65,6 +70,8 @@ const examplesSelect = document.getElementById('examples') as HTMLSelectElement;
 const tabBar = document.getElementById('tab-bar') as HTMLDivElement;
 const viewToggle = document.getElementById('view-toggle') as HTMLDivElement;
 const fontSelect = document.getElementById('font-select') as HTMLSelectElement;
+const gutter = document.getElementById('gutter') as HTMLDivElement;
+const editorContainer = document.getElementById('editor-container') as HTMLDivElement;
 
 const FONT_MAP: Record<string, string> = {
   serif: 'var(--font-serif)',
@@ -91,11 +98,12 @@ function toggleMode(mode: 'edit' | 'preview'): void {
     currentFiles[activeFileIndex].content = editor.value;
     preview.innerHTML = marked(editor.value) as string;
     preview.style.fontFamily = FONT_MAP[fontSelect.value] || FONT_MAP.serif;
-    editor.style.display = 'none';
+    editorContainer.style.display = 'none';
     preview.style.display = '';
   } else {
-    editor.style.display = '';
+    editorContainer.style.display = '';
     preview.style.display = 'none';
+    renderGutter();
   }
 }
 
@@ -122,12 +130,55 @@ fontSelect.addEventListener('change', () => {
   applyFont(fontSelect.value);
 });
 
+function computeScopes(text: string): number[] {
+  const lines = text.split('\n');
+  const depths: number[] = [];
+  let depth = 0;
+
+  for (const line of lines) {
+    const headingMatch = line.match(/^(#{1,6})\s/);
+    if (headingMatch) {
+      const count = headingMatch[1].length;
+      if (count === 1) {
+        depth = 1;
+      } else if (depth >= count - 1) {
+        depth = count;
+      }
+    } else if (/^---\s*$|^\*\*\*\s*$|^___\s*$/.test(line)) {
+      depth = Math.max(depth - 1, 1);
+    }
+    depths.push(depth);
+  }
+
+  return depths;
+}
+
+function renderGutter(): void {
+  const depths = computeScopes(editor.value);
+  let html = '';
+  for (const d of depths) {
+    html += '<div class="gutter-line">';
+    for (let level = 1; level <= d; level++) {
+      html += `<span class="scope-bar level-${level}"></span>`;
+    }
+    html += '</div>';
+  }
+  gutter.innerHTML = html;
+}
+
+editor.addEventListener('scroll', () => {
+  gutter.scrollTop = editor.scrollTop;
+});
+
+editor.addEventListener('input', renderGutter);
+
 function loadProject(key: string): void {
   const project = EXAMPLES[key];
   if (!project) return;
   currentFiles = project.files.map(f => ({ ...f }));
   activeFileIndex = 0;
   editor.value = currentFiles[0].content;
+  renderGutter();
   toggleMode('preview');
   renderTabs();
 }
@@ -185,6 +236,7 @@ function switchTab(index: number): void {
   currentFiles[activeFileIndex].content = editor.value;
   activeFileIndex = index;
   editor.value = currentFiles[index].content;
+  renderGutter();
   if (previewMode) toggleMode('edit');
   renderTabs();
 }

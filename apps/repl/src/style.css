@@ -17,6 +17,12 @@
   --font-serif: Georgia, 'Times New Roman', 'Palatino Linotype', serif;
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-hand: 'Caveat', cursive;
+  --scope-1: #8b7355;
+  --scope-2: #6b8e6b;
+  --scope-3: #7b8daa;
+  --scope-4: #a07da0;
+  --scope-5: #c4836e;
+  --scope-6: #8a9e6e;
 }
 
 html, body {
@@ -275,12 +281,50 @@ main {
 
 .tab-download:hover { color: var(--text); }
 
+#editor-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+#gutter {
+  overflow: hidden;
+  padding-top: 1rem;
+  background: var(--surface);
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.gutter-line {
+  line-height: 1.6;
+  font-size: 0.9rem;
+  height: calc(0.9rem * 1.6);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding-left: 4px;
+}
+
+.scope-bar {
+  width: 2px;
+  display: inline-block;
+  margin-right: 2px;
+}
+
+.scope-bar.level-1 { background: var(--scope-1); }
+.scope-bar.level-2 { background: var(--scope-2); }
+.scope-bar.level-3 { background: var(--scope-3); }
+.scope-bar.level-4 { background: var(--scope-4); }
+.scope-bar.level-5 { background: var(--scope-5); }
+.scope-bar.level-6 { background: var(--scope-6); }
+
 #editor {
   flex: 1;
   resize: none;
   border: none;
   outline: none;
   padding: 1rem;
+  padding-left: 0.5rem;
   font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.6;

@@ -61,6 +61,9 @@
                         <option value="kitchen-sink">Kitchen Sink</option>
                         <option value="fizzbuzz">FizzBuzz</option>
                         <option value="palindrome">Palindrome</option>
+                        <option value="nested-conditionals">
+                            Nested Conditionals
+                        </option>
                         <option value="file-import">File Import</option>
                         <option value="remote-file-import">
                             Remote File Import
@@ -74,11 +77,14 @@
                     </select>
                 </div>
                 <div id="tab-bar"></div>
-                <textarea
-                    id="editor"
-                    spellcheck="false"
-                    autocomplete="off"
-                ></textarea>
+                <div id="editor-container">
+                    <div id="gutter"></div>
+                    <textarea
+                        id="editor"
+                        spellcheck="false"
+                        autocomplete="off"
+                    ></textarea>
+                </div>
                 <div id="preview" style="display:none"></div>
             </section>
             <section class="pane">

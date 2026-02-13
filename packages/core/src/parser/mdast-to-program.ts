@@ -28,10 +28,10 @@ export function mdastToProgram(mdast: Root): Program {
   };
 
   let currentFunction: FunctionDeclaration | null = null;
-  let currentBlock: Statement[] | null = null; // The current block we're adding statements to
+  let blockStack: Statement[][] = []; // blockStack[0] = function body, blockStack[n] = deeper scopes
 
   for (const node of mdast.children) {
-    if (node.type === 'heading' && node.depth === 1) {
+    if (node.type === 'heading' && (node as { depth: number }).depth === 1) {
       // Function declaration: # name
       const funcName = extractText(node as MdastNode);
       currentFunction = {
@@ -40,25 +40,36 @@ export function mdastToProgram(mdast: Root): Program {
         parameters: [],
         body: []
       };
-      currentBlock = currentFunction.body;
+      blockStack = [currentFunction.body];
       program.functions[funcName] = currentFunction;
-    } else if (node.type === 'heading' && node.depth === 2 && currentFunction) {
-      // Conditional block: ## *condition*
-      const conditionText = extractEmphasisText(node as MdastNode);
-      if (conditionText) {
-        const conditional: ConditionalBlock = {
-          type: 'ConditionalBlock',
-          condition: parseExpression(conditionText),
-          body: [],
-          line: (node as MdastNode).position?.start?.line
-        };
-        currentFunction.body.push(conditional);
-        currentBlock = conditional.body;
+    } else if (node.type === 'heading' && currentFunction) {
+      const depth = (node as { depth: number }).depth;
+      if (depth >= 2 && depth <= 6) {
+        // Conditional block: ## - ###### *condition*
+        // Trim blockStack to the required parent depth (depth - 1)
+        while (blockStack.length >= depth) {
+          blockStack.pop();
+        }
+        if (blockStack.length === depth - 1) {
+          const conditionText = extractEmphasisText(node as MdastNode);
+          if (conditionText) {
+            const currentBlock = blockStack[blockStack.length - 1];
+            const conditional: ConditionalBlock = {
+              type: 'ConditionalBlock',
+              condition: parseExpression(conditionText),
+              body: [],
+              line: (node as MdastNode).position?.start?.line
+            };
+            currentBlock.push(conditional);
+            blockStack.push(conditional.body);
+          }
+        }
       }
-    } else if (node.type === 'list' && !node.ordered && currentFunction && currentBlock) {
+    } else if (node.type === 'list' && !node.ordered && currentFunction && blockStack.length > 0) {
       // List items can be:
       // - varname = expr  -> Variable declaration (like 'let')
       // - varname         -> Parameter declaration (only valid at function level)
+      const currentBlock = blockStack[blockStack.length - 1];
       for (const item of node.children) {
         const itemText = extractText(item as MdastNode);
         const line = (item as MdastNode).position?.start?.line;
@@ -75,28 +86,30 @@ export function mdastToProgram(mdast: Root): Program {
           });
         } else {
           // Parameter declaration (only at function body level)
-          if (currentBlock === currentFunction.body) {
+          if (blockStack.length === 1) {
             currentFunction.parameters.push(itemText);
           }
         }
       }
-    } else if (node.type === 'paragraph' && currentBlock) {
+    } else if (node.type === 'paragraph' && blockStack.length > 0) {
       const statement = parseParagraph(node as MdastNode);
       if (statement) {
         statement.line = (node as MdastNode).position?.start?.line;
-        currentBlock.push(statement);
+        blockStack[blockStack.length - 1].push(statement);
       }
     } else if (node.type === 'thematicBreak' && currentFunction) {
-      // Break statement: --- adds break to current block and resets to function body
-      if (currentBlock) {
-        currentBlock.push({ type: 'BreakStatement', line: (node as MdastNode).position?.start?.line });
+      // Break statement: --- adds break to current block and pops one scope level
+      if (blockStack.length > 0) {
+        blockStack[blockStack.length - 1].push({ type: 'BreakStatement', line: (node as MdastNode).position?.start?.line });
       }
-      currentBlock = currentFunction.body;
-    } else if (node.type === 'blockquote' && currentBlock) {
+      if (blockStack.length > 1) {
+        blockStack.pop();
+      }
+    } else if (node.type === 'blockquote' && blockStack.length > 0) {
       // Input statement: > variableName
       const varName = extractText(node as MdastNode).trim();
       if (varName) {
-        currentBlock.push({
+        blockStack[blockStack.length - 1].push({
           type: 'InputStatement',
           variable: varName,
           line: (node as MdastNode).position?.start?.line
