@@ -9,6 +9,7 @@ import palindrome from '@markdownlang/examples/palindrome.md?raw';
 import kitchenSink from '@markdownlang/examples/kitchen-sink.md?raw';
 import fileImport from '@markdownlang/examples/file-import/import-test.md?raw';
 import fileImportLib from '@markdownlang/examples/file-import/lib.md?raw';
+import remoteFileImport from '@markdownlang/examples/remote-file-import/import-test.md?raw';
 import typeError from '@markdownlang/examples/errors/type-error.md?raw';
 import undeclaredError from '@markdownlang/examples/errors/undeclared-error.md?raw';
 
@@ -40,6 +41,10 @@ const EXAMPLES: Record<string, Project> = {
       { name: 'import-test.md', path: '/import-test.md', content: fileImport },
       { name: 'lib.md', path: '/lib.md', content: fileImportLib },
     ],
+  },
+  'remote-file-import': {
+    entry: '/import-test.md',
+    files: [{ name: 'import-test.md', path: '/import-test.md', content: remoteFileImport }],
   },
   'type-error': {
     entry: '/type-error.md',
