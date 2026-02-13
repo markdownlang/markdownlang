@@ -158,7 +158,9 @@ function computeScopes(text: string): number[] {
         depth = count;
       }
     } else if (/^---\s*$|^\*\*\*\s*$|^___\s*$/.test(line)) {
+      depths.push(depth); // --- belongs to the scope it's breaking out of
       depth = Math.max(depth - 1, 1);
+      continue;
     }
     depths.push(depth);
   }
