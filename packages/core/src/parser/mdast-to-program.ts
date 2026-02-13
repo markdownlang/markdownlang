@@ -65,16 +65,22 @@ export function mdastToProgram(mdast: Root): Program {
           }
         }
       }
+    } else if (node.type === 'list' && node.ordered && currentFunction && blockStack.length === 1) {
+      // Ordered list items are parameter declarations (only at function body level)
+      // 1. paramName
+      for (const item of node.children) {
+        const itemText = extractText(item as MdastNode);
+        currentFunction.parameters.push(itemText);
+      }
     } else if (node.type === 'list' && !node.ordered && currentFunction && blockStack.length > 0) {
-      // List items can be:
-      // - varname = expr  -> Variable declaration (like 'let')
-      // - varname         -> Parameter declaration (only valid at function level)
+      // Unordered list items are variable declarations
+      // - varname = expr  -> declare with value
+      // - varname         -> declare as undefined
       const currentBlock = blockStack[blockStack.length - 1];
       for (const item of node.children) {
         const itemText = extractText(item as MdastNode);
         const line = (item as MdastNode).position?.start?.line;
 
-        // Check for variable declaration: varname = expr
         const declMatch = itemText.match(/^(\w+)\s*=\s*(.+)$/);
         if (declMatch) {
           const [, varName, valueStr] = declMatch;
@@ -85,10 +91,13 @@ export function mdastToProgram(mdast: Root): Program {
             line
           });
         } else {
-          // Parameter declaration (only at function body level)
-          if (blockStack.length === 1) {
-            currentFunction.parameters.push(itemText);
-          }
+          // Bare item: declare variable as undefined
+          currentBlock.push({
+            type: 'VariableDeclaration',
+            variable: itemText,
+            value: { type: 'Literal', value: undefined } as Expression,
+            line
+          });
         }
       }
     } else if (node.type === 'paragraph' && blockStack.length > 0) {

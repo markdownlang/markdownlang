@@ -25,7 +25,7 @@ describe('nested-conditionals.md', () => {
 
 # classify
 
-- n
+1. n
 
 ## *n > 0*
 
@@ -66,7 +66,7 @@ describe('nested-conditionals.md', () => {
 
 # classify
 
-- n
+1. n
 
 ## *n > 0*
 
@@ -113,7 +113,7 @@ describe('nested-conditionals.md', () => {
 
 # classify
 
-- n
+1. n
 
 ## *n > 0*
 
@@ -160,7 +160,7 @@ describe('nested-conditionals.md', () => {
 
 # classify
 
-- n
+1. n
 
 ## *n > 0*
 
@@ -201,7 +201,7 @@ describe('nested-conditionals.md', () => {
 
 # classify
 
-- n
+1. n
 
 ## *n > 0*
 
@@ -230,7 +230,7 @@ describe('nested-conditionals.md', () => {
 
 # classify
 
-- n
+1. n
 
 ## *n > 0*
 

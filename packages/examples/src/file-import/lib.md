@@ -1,12 +1,12 @@
 # double
 
-- n
+1. n
 - result = n \* 2
 
 **{result}**
 
 # greet
 
-- name
+1. name
 
 **Hello, {name}!**

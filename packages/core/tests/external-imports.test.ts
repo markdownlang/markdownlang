@@ -82,7 +82,7 @@ describe('remote URL imports', () => {
   });
 
   test('basic remote function call (mocked fetch)', async () => {
-    const remoteLib = `# double\n\n- n\n- result = n * 2\n\n**{result}**\n`;
+    const remoteLib = `# double\n\n1. n\n- result = n * 2\n\n**{result}**\n`;
 
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async (input: string | URL | Request) => {
@@ -105,7 +105,7 @@ describe('remote URL imports', () => {
 
   test('nested relative imports within remote files (mocked fetch)', async () => {
     const remoteMain = `# main\n\n[5](helpers.md#double)\n`;
-    const remoteHelpers = `# double\n\n- n\n- result = n * 2\n\n**{result}**\n`;
+    const remoteHelpers = `# double\n\n1. n\n- result = n * 2\n\n**{result}**\n`;
 
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async (input: string | URL | Request) => {
@@ -161,7 +161,7 @@ describe('remote URL imports', () => {
   });
 
   test('caching: multiple calls to same URL only fetch once (mocked fetch)', async () => {
-    const remoteLib = `# double\n\n- n\n- result = n * 2\n\n**{result}**\n`;
+    const remoteLib = `# double\n\n1. n\n- result = n * 2\n\n**{result}**\n`;
     let fetchCount = 0;
 
     const originalFetch = globalThis.fetch;
@@ -186,17 +186,32 @@ describe('remote URL imports', () => {
     }
   });
 
-  test('real remote import from GitHub', async () => {
+  test('real remote import from GitHub (mocked fetch)', async () => {
     const remoteUrl = 'https://raw.githubusercontent.com/markdownlang/markdownlang/refs/heads/main/packages/examples/src/file-import/lib.md';
-    const md = `# main\n\n[5](${remoteUrl}#double)\n\n["world"](${remoteUrl}#greet)\n`;
-    const program = parse(md);
-    const output = await interpretAsync(program, 'main', [], process.cwd());
-    assert.strictEqual(output[0], 10);
-    assert.strictEqual(output[1], 'Hello, world!');
+    const remoteLib = `# double\n\n1. n\n- result = n * 2\n\n**{result}**\n\n# greet\n\n1. name\n\n**Hello, {name}!**\n`;
+
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+      if (url === remoteUrl) {
+        return new Response(remoteLib, { status: 200 });
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    };
+
+    try {
+      const md = `# main\n\n[5](${remoteUrl}#double)\n\n["world"](${remoteUrl}#greet)\n`;
+      const program = parse(md);
+      const output = await interpretAsync(program, 'main', [], process.cwd());
+      assert.strictEqual(output[0], 10);
+      assert.strictEqual(output[1], 'Hello, world!');
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 
   test('local and remote imports work together', async () => {
-    const remoteLib = `# triple\n\n- n\n- result = n * 3\n\n**{result}**\n`;
+    const remoteLib = `# triple\n\n1. n\n- result = n * 3\n\n**{result}**\n`;
 
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async (input: string | URL | Request) => {

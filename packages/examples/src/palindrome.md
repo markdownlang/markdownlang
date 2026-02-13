@@ -8,7 +8,7 @@
 
 # check
 
-- word
+1. word
 - reversed = ""
 - i = 0
 - len = word.length
@@ -17,10 +17,10 @@
 
 # reverse
 
-- word
-- reversed
-- i
-- len
+1. word
+1. reversed
+1. i
+1. len
 
 ## *i >= len*
 
@@ -34,8 +34,8 @@ reversed += word[len - 1 - i]
 
 # compare
 
-- original
-- reversed
+1. original
+1. reversed
 
 ## *original == reversed*
 

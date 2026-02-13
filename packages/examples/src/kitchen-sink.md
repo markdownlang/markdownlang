@@ -22,7 +22,7 @@
 
 # classify
 
-- n
+1. n
 
 ## *n > 0*
 
@@ -40,9 +40,9 @@
 
 # sum-to
 
-- n
-- sum
-- i
+1. n
+1. sum
+1. i
 
 ## *i > n*
 
@@ -56,7 +56,7 @@ sum += i
 
 # square
 
-- n
+1. n
 - result = n \* n
 
 **{n} squared is {result}**
